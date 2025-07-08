@@ -1,7 +1,6 @@
 <script>
+    import GraphEditor from "$lib/GraphEditor.svelte";
     import NodeEditor from "$lib/NodeEditor.svelte";
 </script>
 
-<p>Hi Svelte</p>
-
-<NodeEditor />
+<GraphEditor />

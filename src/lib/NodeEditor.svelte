@@ -1,17 +1,33 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
+
+    import data from './nodes.json';
+    const nodes = data["nodes"];
+
+    const { node_id } = $props();
+    const node = nodes[node_id];
+    
+    let nodeTitle: string = $state(node.name);
+    let nodeDesc: string = $state(node.description);
+    
+    let nodeImage: string = $state(node.image);
     let imageupload: HTMLInputElement;
 
-    let nodeTitle: string = $state("");
-    let nodeDesc: string = $state("");
-    let nodeImage: string = $state("");
+    let titletype: HTMLInputElement;
+    let desctype: HTMLTextAreaElement;
+    
+    onMount(() => {
+        titletype.value = node.name;
+        desctype.value = node.description;
+    });
 </script>
 
 <div id="panel">
-    <input type="text" bind:value={nodeTitle} class="text-input" id="title" placeholder="Node Title">
+    <input type="text" bind:this={titletype} bind:value={nodeTitle} class="text-input" placeholder="Node Title">
 
     <button id="image" onclick={(event) => { imageupload.click(); }}
     >Upload Image</button>
-    <input type="file" accept="image/*" style:display="none" bind:this={imageupload} onchange={(event) => {
+    <input type="file" accept="image/*" style:display="none" bind:this={imageupload} bind:value={nodeImage} onchange={(event) => {
         const input = event.target as HTMLInputElement;
         if (!input.files || input.files.length === 0) return;
 
@@ -33,9 +49,12 @@
         <img src="/landscape-placeholder.svg" alt="Uploaded Icon" id="display-image"/>
     {/if}
 
-    <textarea rows="8" maxlength="400" bind:value={nodeDesc} class="text-input" id="desc" placeholder="Node Description"></textarea>
+    <textarea rows="8" maxlength="400" bind:this={desctype} bind:value={nodeDesc} class="text-input" id="desc" placeholder="Node Description"></textarea>
 
-    <button id="save">Save</button>
+    <button id="save" onclick={(event) => {
+        // TODO: ADD EDITING CAPABILITIES
+    }}
+    >Save</button>
 </div>
 
 <style>
@@ -47,7 +66,7 @@
         height: fit-content;
 
         background-color: #1e1e1e;
-        color: #aaa;
+        color: #ffffff;
         padding: 10px;
         border-radius: 15px;
     }
