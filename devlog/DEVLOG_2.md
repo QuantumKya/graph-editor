@@ -17,4 +17,4 @@ I've added the GraphEditor screen and the NodePanel for editing node content, ne
 <br>
 <br>
 
-[<-- Previous Devlog](DEVLOG_1.md)<!--   [Next Devlog --\>](DNA_DEVLOG_3.md)-->
+[<-- Previous Devlog](DEVLOG_1.md)   [Next Devlog -->](DNA_DEVLOG_3.md)

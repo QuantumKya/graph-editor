@@ -21,26 +21,10 @@
     let link_data = data["links"];
 
     let focusingNode: MNode | null;
-    let editPanelComp: { node_id: number };
     let editingNode: boolean = false;
-
-    let editPanel: any;
 
     const draw = (ctx: CanvasRenderingContext2D) => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        node_data.forEach((node) => {
-            ctx.beginPath();
-            ctx.arc(
-                (node.position[0] - translation.x) / zoom,
-                (node.position[1] - translation.y) / zoom,
-                20,
-                0,
-                Math.PI * 2
-            );
-            ctx.fillStyle = "black";
-            ctx.fill();
-        });
 
         link_data.forEach((link) => {
             ctx.beginPath();
@@ -51,6 +35,24 @@
             ctx.lineWidth = 7.5;
             ctx.strokeStyle = "black";
             ctx.stroke();
+        });
+
+        node_data.forEach((node) => {
+            const image: HTMLImageElement = new Image();
+            image.src = node.image;
+            
+            const pos = Victor.fromArray(node.position).subtract(translation).divideScalar(zoom);
+            const imgWidth = 25 / zoom;
+
+            ctx.beginPath();
+            ctx.arc(
+                pos.x, pos.y,
+                20 / zoom,
+                0, Math.PI * 2
+            );
+            ctx.fillStyle = "black";
+            ctx.fill();
+            ctx.drawImage(image, pos.x - imgWidth / 2, pos.y - imgWidth / 2, imgWidth, imgWidth);
         });
     }
 
@@ -78,11 +80,9 @@
                 lastMousePos = pos;
             }
         }
-        else if (event.button === 1) {
+        else if (event.button === 2) {
             if (focusingNode) {
                 editingNode = true;
-                editPanel = NodeEditor;
-                editPanelComp = { node_id: focusingNode.id };
             }
         }
     }
@@ -118,8 +118,27 @@
     });
 </script>
 
-<canvas bind:this={canvas} width="1700" height="800"></canvas>
-<svelte:component this={editPanel} style="right: 10px; top: 10px;" {...editPanelComp}/>
+<div id="canvas-box">
+    <canvas bind:this={canvas} width="1700" height="800"></canvas>
+    <div id="edit-panel">
+        {#if (editingNode && focusingNode)}
+            <NodeEditor node_id={focusingNode.id}
+            saveNode={(id: number, title: string, desc: string, img: string) => {
+                if (!window.confirm("Save this node with new contents?")) return;
+
+                node_data[id].name = title;
+                node_data[id].description = desc;
+                node_data[id].image = img;
+            }}
+            exitNode={(saved: boolean) => {
+                if (!saved) if (!window.confirm("Stop editing without saving?")) return;
+                editingNode = false;
+
+                focusingNode = null;
+            }} />
+        {/if}
+    </div>
+</div>
 
 <style>
     canvas {
@@ -128,5 +147,16 @@
 
     canvas:active {
         cursor: grabbing;
+    }
+
+    #canvas-box {
+        position: relative;
+        display: inline-block;
+    }
+
+    #edit-panel {
+        position: absolute;
+        right: 10px;
+        top: 10px;
     }
 </style>

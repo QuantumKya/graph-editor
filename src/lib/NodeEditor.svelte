@@ -4,7 +4,7 @@
     import data from './nodes.json';
     const nodes = data["nodes"];
 
-    const { node_id } = $props();
+    const { node_id, saveNode, exitNode } = $props();
     const node = nodes[node_id];
     
     let nodeTitle: string = $state(node.name);
@@ -15,6 +15,8 @@
 
     let titletype: HTMLInputElement;
     let desctype: HTMLTextAreaElement;
+
+    let saved: boolean = false;
     
     onMount(() => {
         titletype.value = node.name;
@@ -27,7 +29,7 @@
 
     <button id="image" onclick={(event) => { imageupload.click(); }}
     >Upload Image</button>
-    <input type="file" accept="image/*" style:display="none" bind:this={imageupload} bind:value={nodeImage} onchange={(event) => {
+    <input type="file" accept="image/*" style:display="none" bind:this={imageupload} onchange={(event) => {
         const input = event.target as HTMLInputElement;
         if (!input.files || input.files.length === 0) return;
 
@@ -51,10 +53,11 @@
 
     <textarea rows="8" maxlength="400" bind:this={desctype} bind:value={nodeDesc} class="text-input" id="desc" placeholder="Node Description"></textarea>
 
-    <button id="save" onclick={(event) => {
-        // TODO: ADD EDITING CAPABILITIES
-    }}
+    <button id="save" onclick={() => { saveNode(node_id, nodeTitle, nodeDesc, nodeImage); saved = true; }}
     >Save</button>
+
+    <button id="exit" onclick={() => exitNode(saved)}
+    >Exit</button>
 </div>
 
 <style>
@@ -111,7 +114,7 @@
     }
 
     #display-image {
-        max-width: 300px;
-        border-radius: 15px;
+        width: 300px;
+        border-radius: 10px;
     }
 </style>
