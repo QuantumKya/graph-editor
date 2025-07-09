@@ -9,4 +9,4 @@ I had to remove the images from the nodes in order for it to work.
 <br>
 <br>
 
-[<-- Previous Devlog](DEVLOG_4.md)<!--   [Next Devlog --\>](DNA_DEVLOG_6.md)-->
+[<-- Previous Devlog](DEVLOG_4.md)   [Next Devlog -->](DNA_DEVLOG_6.md)

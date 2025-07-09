@@ -28,12 +28,20 @@
     const onchange = () => {
         changed = true;
     };
+
+    const btn_css = "bg-neutral-800 text-white border-blue-500 text-center rounded-xl border-2 w-fit p-2 pt-1 transition duration-200 hover:bg-gray-700";
+    const text_input_css = "font-mono text-lg bg-neutral-800 text-white rounded-xl p-2 pl-3 transition duration-300 focus:bg-gray-700 focus:ring-2 focus:ring-blue-500 outline-none";
 </script>
 
-<div id="panel">
-    <input type="text" bind:this={titletype} bind:value={nodeTitle} {onchange} class="text-input" placeholder="Node Title">
+<div class="flex flex-col gap-3.5 max-w-[350px] h-fit bg-neutral-950 text-white p-2.5 rounded-xl">
+    <input type="text" class="{text_input_css}" placeholder="Node Title"
+        {onchange}
+        bind:this={titletype}
+        bind:value={nodeTitle}
+    >
 
-    <button id="image" onclick={(event) => { imageupload.click(); }}
+
+    <button class="{btn_css}" onclick={(event) => { imageupload.click(); }}
     >Upload Image</button>
     <input type="file" accept="image/*" style:display="none" bind:this={imageupload} onchange={(event) => {
         const input = event.target as HTMLInputElement;
@@ -53,75 +61,24 @@
     }}
     />
     {#if nodeImage != ""}
-        <img src={nodeImage} alt="Uploaded Icon" id="display-image"/>
+        <img src={nodeImage} alt="Uploaded Icon" class="rounded-lg w-[300px]"/>
     {:else}
-        <img src="{base}/landscape-placeholder.svg" alt="Uploaded Icon" id="display-image"/>
+        <img src="{base}/landscape-placeholder.svg" alt="Uploaded Icon" class="rounded-lg w-[300px]"/>
     {/if}
 
-    <textarea rows="8" maxlength="400" bind:this={desctype} bind:value={nodeDesc} {onchange} class="text-input" id="desc" placeholder="Node Description"></textarea>
 
-    <button id="save" onclick={() => { saved = saveNode(node_id, nodeTitle, nodeDesc, nodeImage); }}
+    <textarea rows="6" maxlength="400" class="{text_input_css} placeholder:text-neutral-400 resize-none overflow-scroll" placeholder="Node Description"
+        {onchange}
+        bind:this={desctype}
+        bind:value={nodeDesc}
+    ></textarea>
+
+
+    <button class="{btn_css}"
+        onclick={() => { saved = saveNode(node_id, nodeTitle, nodeDesc, nodeImage); }}
     >Save</button>
 
-    <button id="exit" onclick={() => exitNode(saved, changed)}
+    <button class="{btn_css}"
+        onclick={() => exitNode(saved, changed)}
     >Exit</button>
 </div>
-
-<style>
-    #panel {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-        max-width: 350px;
-        height: fit-content;
-
-        background-color: #1e1e1e;
-        color: #ffffff;
-        padding: 10px;
-        border-radius: 15px;
-    }
-
-    .text-input {
-        font-family: monospace;
-
-        background-color: #3e3e3f;
-        color: #ffffff;
-        border: none;
-        border-radius: 10px;
-        padding: 0.6em 1em;
-        font-size: 1rem;
-        outline: none;
-        transition: background-color 0.3s, box-shadow 0.3s;
-    }
-
-    .text-input::placeholder {
-        color: #aaa;
-    }
-
-    .text-input:focus {
-        background-color: #2a2a2a;
-        box-shadow: 0 0 0 2px #4A90E2;
-    }
-
-    #desc {
-        resize: none;
-        overflow: scroll;
-    }
-
-    button {
-        background-color: rgba(20, 20, 20, 1);
-        color: #ffffff;
-        border-color: #4A90E2;
-        text-align: center;
-        padding: 4px 7.5px 7.5px 7.5px;
-        border-radius: 10px;
-
-        right: 0px;
-        max-width: fit-content;
-    }
-
-    #display-image {
-        width: 300px;
-        border-radius: 10px;
-    }
-</style>

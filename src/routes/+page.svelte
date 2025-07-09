@@ -4,3 +4,4 @@
 </script>
 
 <GraphEditor />
+<NodeEditor node_id={0} saveNode={()=>{}} exitNode={()=>{}} />

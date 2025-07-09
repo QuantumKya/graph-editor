@@ -148,50 +148,27 @@
     }
 </script>
 
-<div id="canvas-box">
+<div id="canvas-box" class="relative inline-block">
 
-    <canvas bind:this={canvas} width="1700" height="800" {onmousemove} {onmousedown} {onmouseup}></canvas>
+    <canvas width="1700" height="800" class="bg-neutral-100 active:cursor-grabbing"
+        bind:this={canvas}
+        {onmousemove} {onmousedown} {onmouseup}
+    ></canvas>
 
-    <div id="edit-panel">
+    <div id="edit-panel" class="absolute right-2.5 top-2.5">
         {#if (editingNode)}
             <NodeEditor node_id={focusNode.id} {saveNode} {exitNode} />
         {/if}
     </div>
 
-    <div id="toolbox">
-        <img src="{base}/landscape-placeholder.svg" alt="" class="tool-option">
+    <div id="toolbox" class="flex absolute rounded-xl bg-neutral-400 p-[15px] pt-[5px] pb-[5px] h-fit bottom-2.5">
+        <img  src="{base}/landscape-placeholder.svg" alt="" class="tool-option">
         <img src="{base}/landscape-placeholder.svg" alt="" class="tool-option">
     </div>
 </div>
 
 <style>
-    canvas {
-        background-color: #d4d4d4;
-    }
-
-    canvas:active {
-        cursor: grabbing;
-    }
-
-    #canvas-box {
-        position: relative;
-        display: inline-block;
-    }
-
-    #edit-panel {
-        position: absolute;
-        right: 10px;
-        top: 10px;
-    }
-
     #toolbox {
-        display: flex;
-        position: absolute;
-        background-color: gray;
-        border-radius: 15px;
-        padding: 5px 15px 5px 15px;
-        height: fit-content;
-        bottom: 10px;
         left: calc(50% - 55px);
     }
 
