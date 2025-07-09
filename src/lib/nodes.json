@@ -1,9 +1,9 @@
 {
     "nodes": [
-        { "id": 0, "name": "Addition", "description": "", "image": "/landscape-placeholder.svg", "position": [100, 100] },
-        { "id": 1, "name": "Subtraction", "description": "", "image": "/landscape-placeholder.svg", "position": [300, 150] },
-        { "id": 2, "name": "Multiplication", "description": "", "image": "/landscape-placeholder.svg", "position": [200, 300] },
-        { "id": 3, "name": "Division", "description": "", "image": "/landscape-placeholder.svg", "position": [300, 450] }
+        { "id": 0, "name": "Addition", "description": "", "image": "", "position": [100, 100] },
+        { "id": 1, "name": "Subtraction", "description": "", "image": "", "position": [300, 150] },
+        { "id": 2, "name": "Multiplication", "description": "", "image": "", "position": [200, 300] },
+        { "id": 3, "name": "Division", "description": "", "image": "", "position": [300, 450] }
     ],
 
     "links": [
