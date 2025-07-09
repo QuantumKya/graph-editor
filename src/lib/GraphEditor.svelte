@@ -1,5 +1,6 @@
 <script lang="ts">
     import { onMount } from 'svelte';
+    import { base } from '$app/paths';
     import NodeEditor from './NodeEditor.svelte';
 
     import data from './nodes.json';
@@ -158,8 +159,8 @@
     </div>
 
     <div id="toolbox">
-        <img src="/landscape-placeholder.svg" alt=""  class="tool-option">
-        <img src="/landscape-placeholder.svg" alt="" class="tool-option">
+        <img src="{base}/landscape-placeholder.svg" alt="" class="tool-option">
+        <img src="{base}/landscape-placeholder.svg" alt="" class="tool-option">
     </div>
 </div>
 

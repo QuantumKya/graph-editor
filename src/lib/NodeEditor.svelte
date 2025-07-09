@@ -1,5 +1,6 @@
 <script lang="ts">
     import { onMount } from 'svelte';
+    import { base } from '$app/paths';
 
     import data from './nodes.json';
     const nodes = data["nodes"];
@@ -54,7 +55,7 @@
     {#if nodeImage != ""}
         <img src={nodeImage} alt="Uploaded Icon" id="display-image"/>
     {:else}
-        <img src="/landscape-placeholder.svg" alt="Uploaded Icon" id="display-image"/>
+        <img src="{base}/landscape-placeholder.svg" alt="Uploaded Icon" id="display-image"/>
     {/if}
 
     <textarea rows="8" maxlength="400" bind:this={desctype} bind:value={nodeDesc} {onchange} class="text-input" id="desc" placeholder="Node Description"></textarea>
