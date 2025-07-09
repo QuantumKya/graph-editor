@@ -16,16 +16,21 @@
     let titletype: HTMLInputElement;
     let desctype: HTMLTextAreaElement;
 
+    let changed: boolean = false;
     let saved: boolean = false;
     
     onMount(() => {
         titletype.value = node.name;
         desctype.value = node.description;
     });
+
+    const onchange = () => {
+        changed = true;
+    };
 </script>
 
 <div id="panel">
-    <input type="text" bind:this={titletype} bind:value={nodeTitle} class="text-input" placeholder="Node Title">
+    <input type="text" bind:this={titletype} bind:value={nodeTitle} {onchange} class="text-input" placeholder="Node Title">
 
     <button id="image" onclick={(event) => { imageupload.click(); }}
     >Upload Image</button>
@@ -43,6 +48,7 @@
         };
 
         reader.readAsDataURL(file);
+        onchange();
     }}
     />
     {#if nodeImage != ""}
@@ -51,12 +57,12 @@
         <img src="/landscape-placeholder.svg" alt="Uploaded Icon" id="display-image"/>
     {/if}
 
-    <textarea rows="8" maxlength="400" bind:this={desctype} bind:value={nodeDesc} class="text-input" id="desc" placeholder="Node Description"></textarea>
+    <textarea rows="8" maxlength="400" bind:this={desctype} bind:value={nodeDesc} {onchange} class="text-input" id="desc" placeholder="Node Description"></textarea>
 
-    <button id="save" onclick={() => { saveNode(node_id, nodeTitle, nodeDesc, nodeImage); saved = true; }}
+    <button id="save" onclick={() => { saved = saveNode(node_id, nodeTitle, nodeDesc, nodeImage); }}
     >Save</button>
 
-    <button id="exit" onclick={() => exitNode(saved)}
+    <button id="exit" onclick={() => exitNode(saved, changed)}
     >Exit</button>
 </div>
 
