@@ -1,10 +1,12 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { base } from '$app/paths';
+    
     import NodeEditor from './NodeEditor.svelte';
+    import ModePicker from './ModePicker.svelte';
 
-    import data from './nodes.json';
     import Victor from 'victor';
+    import data from './nodes.json';
 
     type MNode = { "id": number, "name": string, "description": string, "image": string, "position": number[] };
 
@@ -22,8 +24,6 @@
     let link_data = data["links"];
 
     let imageBuffer: HTMLImageElement[] = [];
-
-    let mode = $state('');
 
     let focusNode: MNode = $state(node_data[0]);
     let draggingNode: boolean = false;
@@ -119,19 +119,6 @@
         draggingCanvas = false;
     }
 
-    onMount(() => {
-        canvas.addEventListener('contextmenu', event => event.preventDefault()); 
-
-        for (const node of node_data) {
-            let img = new Image();
-            img.src = node.image;
-            imageBuffer.push(img);
-        }
-
-        let ctx = canvas?.getContext("2d");
-        if (ctx !== null) draw(ctx);
-    });
-
     
     const saveNode = (id: number, title: string, desc: string, img: string): boolean => {
         if (!window.confirm("Save this node with new contents?")) return false;
@@ -146,6 +133,20 @@
         if (!saved && changed) if (!window.confirm("Stop editing without saving?")) return;
         editingNode = false;
     }
+    
+
+    onMount(() => {
+        canvas.addEventListener('contextmenu', event => event.preventDefault()); 
+
+        for (const node of node_data) {
+            let img = new Image();
+            img.src = node.image;
+            imageBuffer.push(img);
+        }
+
+        let ctx = canvas?.getContext("2d");
+        if (ctx !== null) draw(ctx);
+    });
 </script>
 
 <div id="canvas-box" class="relative inline-block">
@@ -161,18 +162,5 @@
         {/if}
     </div>
 
-    <div id="toolbox" class="flex absolute rounded-xl bg-neutral-400 p-[15px] pt-[5px] pb-[5px] h-fit bottom-2.5">
-        <img  src="{base}/landscape-placeholder.svg" alt="" class="tool-option">
-        <img src="{base}/landscape-placeholder.svg" alt="" class="tool-option">
-    </div>
+    <ModePicker />
 </div>
-
-<style>
-    #toolbox {
-        left: calc(50% - 55px);
-    }
-
-    #toolbox img {
-        max-width: 40px;
-    }
-</style>

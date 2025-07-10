@@ -9,4 +9,4 @@ For ease of repetition, I defined the css strings in my TS, and used them in the
 <br>
 <br>
 
-[<-- Previous Devlog](DEVLOG_5.md)<!--   [Next Devlog --\>](DNA_DEVLOG_7.md)-->
+[<-- Previous Devlog](DEVLOG_5.md)   [Next Devlog -->](DNA_DEVLOG_7.md)
