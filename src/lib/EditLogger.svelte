@@ -1,11 +1,34 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+    import { onMount } from "svelte";
 
     let editLog: string[] = $state([]);
     let logArea: HTMLTextAreaElement;
+    
+    let backPace: number = $state(0);
+    let actionLog: string[] = $state([]);
 
-    export const log = (msg: string) => editLog.push(msg);
-    $effect(() => { logArea.value += '\n' + editLog.at(-1); });
+    export const log = (action: string, detail?: string) => {
+        backPace = 0;
+        actionLog.push(action);
+        editLog.push((detail === undefined) ? action : action + ":\n\t" + detail);
+    };
+    
+    export const undo = () => {
+        if (backPace > actionLog.length - 2) return;
+        backPace++;
+        editLog.push("Undo: " + actionLog.at(-backPace));
+    };
+    
+    export const redo = () => {
+        if (backPace < 1) return;
+        editLog.push("Redo: " + actionLog.at(-backPace));
+        backPace--;
+    };
+
+    $effect(() => {
+        logArea.value += '\n' + editLog.at(-1);
+        logArea.scrollTop = logArea.scrollHeight;
+    });
     
     onMount(() => {
         logArea.value = "";

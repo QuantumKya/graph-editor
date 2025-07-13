@@ -7,6 +7,7 @@
     import Victor from 'victor';
     import data from './nodes.json';
     import EditLogger from './EditLogger.svelte';
+  import UndoRedo from './UndoRedo.svelte';
 
     type MNode = { "id": number, "name": string, "description": string, "image": string, "position": number[] };
 
@@ -138,7 +139,7 @@
                         if (linkNode.id === focusNode.id) return;
                         link_data.push({ from: linkNode.id, to: focusNode.id });
                         linkingNode = false;
-                        logger.log(`New link created:\n\tnode ${linkNode.id} -> ${focusNode.id}`);
+                        logger.log("Create link", `node ${linkNode.id} -> ${focusNode.id}`);
                     }
                     else {
                         linkNode = node;
@@ -222,6 +223,14 @@
         editingNode = false;
     };
 
+    const undo = () => {
+        logger.undo();
+    };
+
+    const redo = () => {
+        logger.redo();
+    };
+
     onMount(draw);
 </script>
 
@@ -240,6 +249,8 @@
     </div>
 
     <EditLogger bind:this={logger} />
+
+    <UndoRedo {undo} {redo} />
 
     <ModePicker on:modeChanged={(e) => mode = e.detail} />
 </div>
