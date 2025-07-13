@@ -6,6 +6,7 @@
 
     import Victor from 'victor';
     import data from './nodes.json';
+    import EditLogger from './EditLogger.svelte';
 
     type MNode = { "id": number, "name": string, "description": string, "image": string, "position": number[] };
 
@@ -27,7 +28,7 @@
     let node_data = data["nodes"];
     let link_data = data["links"];
 
-    let imageBuffer: HTMLImageElement[] = [];
+    let imageBuffer: HTMLImageElement[];
 
     let focusNode: MNode = $state(node_data[0]);
     let draggingNode: boolean = $state(false);
@@ -38,7 +39,14 @@
 
     let mode: number = 0;
 
-    const draw = (ctx: CanvasRenderingContext2D) => {
+    let logger: EditLogger;
+
+    const draw = () => {
+        imageBuffer = node_data.map(node => { let img = new Image(); img.src = node.image; return img; });
+
+        const ctx = canvas.getContext("2d");
+        if (ctx === null) throw new Error("DRAW LOOP - ctx is null");
+
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -80,7 +88,7 @@
             ctx.drawImage(imageBuffer[index], pos.x - imgWidth / 2, pos.y - imgWidth / 2, imgWidth, imgWidth);
         });
 
-        requestAnimationFrame(() => draw(ctx));
+        requestAnimationFrame(draw);
     };
 
     const getMousePos = (event: MouseEvent) => {
@@ -130,6 +138,7 @@
                         if (linkNode.id === focusNode.id) return;
                         link_data.push({ from: linkNode.id, to: focusNode.id });
                         linkingNode = false;
+                        logger.log(`New link created:\n\tnode ${linkNode.id} -> ${focusNode.id}`);
                     }
                     else {
                         linkNode = node;
@@ -213,24 +222,14 @@
         editingNode = false;
     };
 
-
-    onMount(() => {
-        for (const node of node_data) {
-            let img = new Image();
-            img.src = node.image;
-            imageBuffer.push(img);
-        }
-
-        let ctx = canvas?.getContext("2d");
-        if (ctx !== null) draw(ctx);
-    });
+    onMount(draw);
 </script>
 
-<div id="canvas-box" class="relative inline-block overflow-hidden" {onwheel}>
+<div id="canvas-box" class="relative inline-block overflow-hidden">
 
     <canvas class="bg-neutral-100" class:cursor-grabbing={draggingNode || draggingCanvas}
         bind:this={canvas}
-        {onmousemove} {onmousedown} {onmouseup} {onkeydown}
+        {onmousemove} {onmousedown} {onmouseup} {onkeydown} {onwheel}
         oncontextmenu={event => event.preventDefault()}
     ></canvas>
 
@@ -239,6 +238,8 @@
             <NodeEditor node_id={focusNode.id} {saveNode} {exitNode} />
         {/if}
     </div>
+
+    <EditLogger bind:this={logger} />
 
     <ModePicker on:modeChanged={(e) => mode = e.detail} />
 </div>
