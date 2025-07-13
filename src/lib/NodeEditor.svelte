@@ -72,13 +72,15 @@
         bind:this={desctype}
         bind:value={nodeDesc}
     ></textarea>
+    
 
-
-    <button class="{btn_css}"
-        onclick={() => { saved = saveNode(node_id, nodeTitle, nodeDesc, nodeImage); }}
-    >Save</button>
-
-    <button class="{btn_css}"
-        onclick={() => exitNode(saved, changed)}
-    >Exit</button>
+    <div class="relative inline-block h-fit">
+        <button class="{btn_css} float-left"
+            onclick={() => { saved = saveNode(node_id, nodeTitle, nodeDesc, nodeImage); }}
+        >Save</button>
+        
+        <button class="{btn_css} float-right"
+            onclick={() => exitNode(saved, changed)}
+        >Exit</button>
+    </div>
 </div>
