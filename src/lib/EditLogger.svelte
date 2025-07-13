@@ -32,11 +32,14 @@
     
     onMount(() => {
         logArea.value = "";
-        log(" ------------------ Edit Log ------------------ \n");
     });
 </script>
 
-<textarea class="resize-none absolute h-[200px] max-w-[500px] max-h-[450px] rounded-xl overflow-y-scroll text-wrap font-mono text-blue-300 bg-gray-700 bottom-1 left-1"
-    readonly cols=48
-    bind:this={logArea}>
-</textarea>
+<div class="flex flex-col gap-0 absolute w-fit p-1 rounded-xl bottom-1 left-1 font-mono text-blue-300 bg-gray-700">
+    <p class="text-center"> ------------------ Edit Log ------------------ </p>
+    
+    <textarea class="resize-none h-[200px] max-h-[350px] overflow-y-scroll text-wrap outline-none"
+        readonly cols=48
+        bind:this={logArea}>
+    </textarea>
+</div>

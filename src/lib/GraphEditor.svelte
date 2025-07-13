@@ -7,7 +7,7 @@
     import Victor from 'victor';
     import data from './nodes.json';
     import EditLogger from './EditLogger.svelte';
-  import UndoRedo from './UndoRedo.svelte';
+    import UndoRedo from './UndoRedo.svelte';
 
     type MNode = { "id": number, "name": string, "description": string, "image": string, "position": number[] };
 
@@ -153,7 +153,10 @@
                         const n2 = node_data[lnk.to];
                         return findDistance(Victor.fromArray(n1.position), Victor.fromArray(n2.position), pos) < 10;
                     });
-                    if (link_id !== -1) link_data.splice(link_id, 1);
+                    if (link_id !== -1) {
+                        link_data.splice(link_id, 1);
+                        logger.log("Delete link", `node ${linkNode.id} -> ${focusNode.id}`);
+                    }
                 }
             }
         }
@@ -187,7 +190,10 @@
     const onmouseup = (event: MouseEvent) => {
         if (editingNode) return;
 
-        draggingNode = false;
+        if (draggingNode) {
+            draggingNode = false;
+            logger.log("Set node position");
+        }
         draggingCanvas = false;
     };
     
@@ -210,7 +216,22 @@
 
     
     const saveNode = (id: number, title: string, desc: string, img: string): boolean => {
+        let checkArray = [
+            node_data[id].name === title ? "" : "name", 
+            node_data[id].description === desc ? "" : "description",
+            node_data[id].image === img ? "" : "image"
+        ];
+        
+        let strArray: string[] = [];
+        checkArray.forEach((check) => {
+            if (check !== "") strArray.push(check);
+        });
+        const checkString = strArray.join(", ");
+
+        if (checkString === "") return false;
         if (!window.confirm("Save this node with new contents?")) return false;
+
+        logger.log("Update node contents", checkString);
 
         node_data[id].name = title;
         node_data[id].description = desc;

@@ -15,4 +15,4 @@ Next, I'll add all of the edit messages and actual logic.
 <br>
 <br>
 
-[<-- Previous Devlog](DEVLOG_9.md)<!--   [Next Devlog --\>](DNA_DEVLOG_11.md)-->
+[<-- Previous Devlog](DEVLOG_9.md)   [Next Devlog -->](DNA_DEVLOG_11.md)

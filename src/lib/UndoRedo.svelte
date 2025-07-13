@@ -1,6 +1,4 @@
 <script lang="ts">
-    
-
     let { undo, redo } = $props();
 
     const btn_css = "border-none rounded-full w-fit h-fit bg-gray-300 p-2 pt-0.5 pb-1 text-center";
