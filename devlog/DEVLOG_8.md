@@ -22,7 +22,8 @@ Unfortunately, now, whenever you drag the canvas, it jitters a bit. I don't know
 <br>
 <br>
 
-![Hi-yah!!!](img/link_hi.jpg)
+![Hi-yah!!!](img/link_hi.png)
+
 Oh, hi! I was talking about the node links, though, not you guys.
 
 <br>
