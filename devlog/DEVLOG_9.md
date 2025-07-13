@@ -6,12 +6,6 @@ First, I'm going to make a Godot-style edit log to show what you're doing. The c
 
 ![Edit Log Code](img/devlog_9_edit_log_code.png)
 
-### Side Note:
-
-I changed the draw function to instead be an `$effect()` function. This way, it only updates when it needs to rather than running all that code every frame.
-
-### Side note over.
-
 Now, different parts of code can call its function, and send a message to be put in the log! It only needs to be this simple.
 
 ![Log Call](img/devlog_9_que_pasa.png)
