@@ -2,10 +2,7 @@
     import { onMount } from 'svelte';
     import { base } from '$app/paths';
 
-    import data from './nodes.json';
-    const nodes = data["nodes"];
-
-    const { node_id, saveNode, exitNode } = $props();
+    const { nodes, node_id, saveNode, exitNode } = $props();
     const node = nodes[node_id];
     
     let nodeTitle: string = $state(node.name);

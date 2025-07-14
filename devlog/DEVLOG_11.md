@@ -17,4 +17,4 @@ The only one that was more complex was the node saving one, where I had to some 
 <br>
 <br>
 
-[<-- Previous Devlog](DEVLOG_10.md)<!--   [Next Devlog --\>](DNA_DEVLOG_12.md)-->
+[<-- Previous Devlog](DEVLOG_10.md)   [Next Devlog -->](DNA_DEVLOG_12.md)

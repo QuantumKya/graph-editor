@@ -8,13 +8,16 @@
     let actionLog: string[] = $state([]);
 
     export const log = (action: string, detail?: string) => {
-        backPace = 0;
+        if (backPace > 0) {
+            editLog.splice(-backPace, backPace);
+            backPace = 0;
+        }
         actionLog.push(action);
         editLog.push((detail === undefined) ? action : action + ":\n\t" + detail);
     };
     
     export const undo = () => {
-        if (backPace > actionLog.length - 2) return;
+        if (backPace > actionLog.length - 1) return;
         backPace++;
         editLog.push("Undo: " + actionLog.at(-backPace));
     };

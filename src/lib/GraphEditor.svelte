@@ -5,11 +5,36 @@
     import ModePicker from './ModePicker.svelte';
 
     import Victor from 'victor';
-    import data from './nodes.json';
+    import graphData from './nodes.json';
     import EditLogger from './EditLogger.svelte';
     import UndoRedo from './UndoRedo.svelte';
 
-    type MNode = { "id": number, "name": string, "description": string, "image": string, "position": number[] };
+    const cloneDatum = (datum: typeof graphData) => {
+        return {
+            nodes: datum.nodes.map(node => ({ ...node, position: [...node.position] })),
+            links: datum.links.map(link => ({ ...link }))
+        };
+    };
+
+    const setState = () => {
+        const state = stateBuffer.at(-backPace) ?? data;
+        data = cloneDatum(state);
+
+        if (imageBuffer.length !== data["nodes"].length) {
+            while (imageBuffer.length < data["nodes"].length) {
+                imageBuffer.push(new Image());
+            }
+            while (imageBuffer.length > data["nodes"].length) {
+                imageBuffer.pop();
+            }
+        }
+        data["nodes"].forEach((node, i) => {
+            imageBuffer[i].src = node.image;
+        });
+        const newFocus = data["nodes"].find(n => n.id === focusNode.id);
+        if (newFocus) focusNode = newFocus;
+        else focusNode = data["nodes"][0];
+    };
 
     let canvas: HTMLCanvasElement;
 
@@ -26,16 +51,17 @@
 
     let dragOffset: Victor = new Victor(0, 0);
 
-    let node_data = data["nodes"];
-    let link_data = data["links"];
+    let data = $state(cloneDatum(graphData));
+    let stateBuffer: (typeof graphData)[] = [cloneDatum(graphData)];
+    let backPace: number = 1;
 
-    let imageBuffer: HTMLImageElement[];
+    let imageBuffer: HTMLImageElement[] = [];
 
-    let focusNode: MNode = $state(node_data[0]);
+    let focusNode: typeof graphData["nodes"][0] = $state(graphData["nodes"][0]);
     let draggingNode: boolean = $state(false);
     let editingNode: boolean = $state(false);
 
-    let linkNode: MNode;
+    let linkNode: typeof graphData["nodes"][0];
     let linkingNode: boolean = $state(false);
 
     let mode: number = 0;
@@ -43,8 +69,6 @@
     let logger: EditLogger;
 
     const draw = () => {
-        imageBuffer = node_data.map(node => { let img = new Image(); img.src = node.image; return img; });
-
         const ctx = canvas.getContext("2d");
         if (ctx === null) throw new Error("DRAW LOOP - ctx is null");
 
@@ -61,10 +85,10 @@
             ctx.stroke();
         }
 
-        link_data.forEach((link) => {
+        data["links"].forEach((link) => {
             ctx.beginPath();
-            const node1 = node_data[link["from"]];
-            const node2 = node_data[link["to"]];
+            const node1 = data["nodes"][link["from"]];
+            const node2 = data["nodes"][link["to"]];
             ctx.moveTo(node1.position[0] - translation.x, node1.position[1] - translation.y);
             ctx.lineTo(node2.position[0] - translation.x, node2.position[1] - translation.y);
             ctx.lineWidth = 10;
@@ -72,7 +96,7 @@
             ctx.stroke();
         });
 
-        node_data.forEach((node, index) => {
+        data["nodes"].forEach((node, index) => {
             imageBuffer[index].src = node.image;
             
             const pos = Victor.fromArray(node.position).subtract(translation);
@@ -116,7 +140,7 @@
         if (editingNode) return;
 
         const pos = getMousePos(event);
-        let node = node_data.find(
+        let node = data["nodes"].find(
             node => Victor.fromArray(node.position).distanceSq(pos) < 400
         );
         focusNode = node ?? focusNode;
@@ -137,8 +161,10 @@
                 if (node) {
                     if (linkingNode) {
                         if (linkNode.id === focusNode.id) return;
-                        link_data.push({ from: linkNode.id, to: focusNode.id });
+                        data["links"].push({ from: linkNode.id, to: focusNode.id });
                         linkingNode = false;
+
+                        update();
                         logger.log("Create link", `node ${linkNode.id} -> ${focusNode.id}`);
                     }
                     else {
@@ -148,13 +174,15 @@
                     }
                 }
                 else {
-                    const link_id = link_data.findIndex(lnk => {
-                        const n1 = node_data[lnk.from];
-                        const n2 = node_data[lnk.to];
+                    const link_id = data["links"].findIndex(lnk => {
+                        const n1 = data["nodes"][lnk.from];
+                        const n2 = data["nodes"][lnk.to];
                         return findDistance(Victor.fromArray(n1.position), Victor.fromArray(n2.position), pos) < 10;
                     });
                     if (link_id !== -1) {
-                        link_data.splice(link_id, 1);
+                        data["links"].splice(link_id, 1);
+
+                        update();
                         logger.log("Delete link", `node ${linkNode.id} -> ${focusNode.id}`);
                     }
                 }
@@ -164,7 +192,7 @@
         if (event.button === 2) {
             draggingCanvas = true;
             dragStartMouse = pos;
-            dragStartTranslation = translation;
+            dragStartTranslation = translation.clone();
         }
     };
 
@@ -175,7 +203,7 @@
         lastMousePos = pos;
 
         if (draggingNode) {
-            let node = node_data.find(n => n.id === focusNode.id);
+            let node = data["nodes"].find(n => n.id === focusNode.id);
             if (node === undefined) throw new Error("uhhh focusNode error, it's not in the list...");
             else {
                 node.position = pos.clone().subtract(dragOffset).toArray();
@@ -192,6 +220,8 @@
 
         if (draggingNode) {
             draggingNode = false;
+
+            update();
             logger.log("Set node position");
         }
         draggingCanvas = false;
@@ -217,9 +247,9 @@
     
     const saveNode = (id: number, title: string, desc: string, img: string): boolean => {
         let checkArray = [
-            node_data[id].name === title ? "" : "name", 
-            node_data[id].description === desc ? "" : "description",
-            node_data[id].image === img ? "" : "image"
+            data["nodes"][id].name === title ? "" : "name", 
+            data["nodes"][id].description === desc ? "" : "description",
+            data["nodes"][id].image === img ? "" : "image"
         ];
         
         let strArray: string[] = [];
@@ -230,12 +260,13 @@
 
         if (checkString === "") return false;
         if (!window.confirm("Save this node with new contents?")) return false;
+        
+        data["nodes"][id].name = title;
+        data["nodes"][id].description = desc;
+        data["nodes"][id].image = img;
 
+        update();
         logger.log("Update node contents", checkString);
-
-        node_data[id].name = title;
-        node_data[id].description = desc;
-        node_data[id].image = img;
         return true;
     };
     
@@ -244,20 +275,44 @@
         editingNode = false;
     };
 
+
+    const update = () => {
+        if (backPace > 1) {
+            stateBuffer.splice(-backPace + 1, backPace - 1);
+            backPace = 1;
+        }
+        stateBuffer.push(cloneDatum(data));
+        console.log(stateBuffer);
+        console.log(backPace);
+    };
+
     const undo = () => {
+        if (backPace > stateBuffer.length - 1) return;
+        backPace++;
+        setState();
         logger.undo();
+        console.log(stateBuffer);
+        console.log(backPace);
     };
 
     const redo = () => {
+        if (backPace < 2) return;
+        backPace--;
+        setState();
         logger.redo();
+        console.log(stateBuffer);
+        console.log(backPace);
     };
 
-    onMount(draw);
+    onMount(() => {
+        imageBuffer = data["nodes"].map(node => { let img = new Image(); img.src = node.image; return img; });
+        draw();
+    });
 </script>
 
 <div id="canvas-box" class="relative inline-block overflow-hidden">
 
-    <canvas class="bg-neutral-100" class:cursor-grabbing={draggingNode || draggingCanvas}
+    <canvas class="bg-neutral-100" tabindex="0" class:cursor-grabbing={draggingNode || draggingCanvas}
         bind:this={canvas}
         {onmousemove} {onmousedown} {onmouseup} {onkeydown} {onwheel}
         oncontextmenu={event => event.preventDefault()}
@@ -265,7 +320,7 @@
 
     <div class="absolute right-2.5 top-2.5">
         {#if (editingNode)}
-            <NodeEditor node_id={focusNode.id} {saveNode} {exitNode} />
+            <NodeEditor node_id={focusNode.id} {saveNode} {exitNode} nodes={data["nodes"]} />
         {/if}
     </div>
 
