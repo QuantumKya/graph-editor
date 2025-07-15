@@ -2,8 +2,7 @@
     import { onMount } from 'svelte';
     import { base } from '$app/paths';
 
-    const { nodes, node_id, saveNode, exitNode } = $props();
-    const node = nodes[node_id];
+    const { node, saveNode, exitNode } = $props();
     
     let nodeTitle: string = $state(node.name);
     let linkAddend: string = $state('');
@@ -21,7 +20,6 @@
 
     let titletype: HTMLInputElement;
     let addendtype: HTMLInputElement;
-    //let desctype: HTMLTextAreaElement;
 
     let changed: boolean = false;
     let saved: boolean = false;
@@ -29,7 +27,6 @@
     onMount(() => {
         titletype.value = node.name;
         addendtype.value = node.addend;
-        //desctype.value = node.description;
     });
 
     const onchange = () => {
@@ -73,14 +70,6 @@
         <img src="{base}/landscape-placeholder.svg" alt="Uploaded Icon" class="rounded-lg w-[300px]"/>
     {/if}
 
-    <!--
-    <textarea rows="6" maxlength="400" class="{text_input_css} placeholder:text-neutral-400 resize-none overflow-scroll" placeholder="Node Description"
-        {onchange}
-        bind:this={desctype}
-        bind:value={nodeDesc}
-    ></textarea>
-    -->
-
     <input type="text" class="{text_input_css}" placeholder="Link Addend"
         {onchange}
         bind:this={addendtype}
@@ -92,7 +81,7 @@
 
     <div class="relative inline-block h-fit">
         <button class="{btn_css} float-left"
-            onclick={() => { saved = saveNode(node_id, nodeTitle, linkAddend, nodeImage); }}
+            onclick={() => { saved = saveNode(node, nodeTitle, linkAddend, nodeImage); }}
         >Save</button>
         
         <button class="{btn_css} float-right"

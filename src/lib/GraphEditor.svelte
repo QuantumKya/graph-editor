@@ -8,8 +8,10 @@
     import graphData from './nodes.json';
     import EditLogger from './EditLogger.svelte';
     import UndoRedo from './UndoRedo.svelte';
+    import LinkEditor from './LinkEditor.svelte';
 
     type MNode = typeof graphData["nodes"][0];
+    type MLink = typeof graphData["links"][0];
 
     const cloneDatum = (datum: typeof graphData) => {
         return {
@@ -62,6 +64,9 @@
     let focusNode: MNode = $state(graphData["nodes"][0]);
     let draggingNode: boolean = $state(false);
     let editingNode: boolean = $state(false);
+
+    let focusLink: MLink = $state(graphData["links"][0]);
+    let editingLink: boolean = $state(false);
 
     let linkNode: MNode;
     let linkingNode: boolean = $state(false);
@@ -144,6 +149,14 @@
             node => Victor.fromArray(node.position).distanceSq(pos) < 400
         );
         focusNode = node ?? focusNode;
+
+        let link = data["links"].find(lnk => {
+            const n1 = data["nodes"][lnk.from];
+            const n2 = data["nodes"][lnk.to];
+            return findDistance(Victor.fromArray(n1.position), Victor.fromArray(n2.position), pos) < 10;
+        });
+        focusLink = link ?? focusLink;
+        const link_id = data["links"].indexOf(focusLink);
         
         // toolbar action
         if (event.button === 0) {
@@ -184,12 +197,13 @@
                 dragOffset = pos.clone().subtract(Victor.fromArray(focusNode.position));
                 draggingNode = true;
             }
-            // link editing
+            // link adding
             else if (mode === 3) {
                 if (node) {
                     if (linkingNode) {
                         if (linkNode.id === focusNode.id) return;
-                        data["links"].push({ from: linkNode.id, to: focusNode.id });
+                        if (data["links"].filter(lnk => (lnk.from === linkNode.id && lnk.to === focusNode.id) || (lnk.from === focusNode.id && lnk.to === linkNode.id)).length !== 0) return;
+                        data["links"].push({ from: linkNode.id, to: focusNode.id, name: "", description: "" });
                         linkingNode = false;
 
                         update();
@@ -201,19 +215,16 @@
                         lastMousePos = pos;
                     }
                 }
-                else {
-                    const link_id = data["links"].findIndex(lnk => {
-                        const n1 = data["nodes"][lnk.from];
-                        const n2 = data["nodes"][lnk.to];
-                        return findDistance(Victor.fromArray(n1.position), Victor.fromArray(n2.position), pos) < 10;
-                    });
-                    if (link_id !== -1) {
-                        data["links"].splice(link_id, 1);
+                else { if (!link) return;
+                    data["links"].splice(link_id, 1);
 
-                        update();
-                        logger.log("Delete link", `node ${linkNode.id} -> ${focusNode.id}`);
-                    }
+                    update();
+                    logger.log("Delete link", `node ${linkNode.id} -> ${focusNode.id}`);
                 }
+            }
+            // link editing
+            else if (mode === 4) { if (!link) return;
+                editingLink = true;
             }
         }
         // dragging canvas
@@ -286,11 +297,11 @@
     };
 
     
-    const saveNode = (id: number, title: string, add: string, img: string): boolean => {
+    const saveNode = (node: MNode, title: string, add: string, img: string): boolean => {
         let checkArray = [
-            data["nodes"][id].name === title ? "" : "name",
-            data["nodes"][id].addend === add ? "" : "addend",
-            data["nodes"][id].image === img ? "" : "image"
+            node.name === title ? "" : "name",
+            node.addend === add ? "" : "addend",
+            node.image === img ? "" : "image"
         ];
         
         let strArray: string[] = [];
@@ -302,9 +313,9 @@
         if (checkString === "") return false;
         if (!window.confirm("Save this node with new contents?")) return false;
         
-        data["nodes"][id].name = title;
-        data["nodes"][id].addend = add;
-        data["nodes"][id].image = img;
+        node.name = title;
+        node.addend = add;
+        node.image = img;
 
         update();
         logger.log("Update node contents", checkString);
@@ -314,6 +325,34 @@
     const exitNode = (saved: boolean, changed: boolean) => {
         if (!saved && changed) if (!window.confirm("Stop editing without saving?")) return;
         editingNode = false;
+    };
+
+    const saveLink = (link: MLink, title: string, desc: string) => {
+        let checkArray = [
+            link.name === title ? "" : "name",
+            link.description === desc ? "" : "description"
+        ];
+        
+        let strArray: string[] = [];
+        checkArray.forEach((check) => {
+            if (check !== "") strArray.push(check);
+        });
+        const checkString = strArray.join(", ");
+
+        if (checkString === "") return false;
+        if (!window.confirm("Save this node with new contents?")) return false;
+        
+        link.name = title;
+        link.description = desc;
+
+        update();
+        logger.log("Update node contents", checkString);
+        return true;
+    };
+
+    const exitLink = (saved: boolean, changed: boolean) => {
+        if (!saved && changed) if (!window.confirm("Stop editing without saving?")) return;
+        editingLink = false;
     };
 
 
@@ -373,7 +412,9 @@
 
     <div class="absolute right-2.5 top-2.5">
         {#if (editingNode)}
-            <NodeEditor node_id={focusNode.id} {saveNode} {exitNode} nodes={data["nodes"]} />
+            <NodeEditor node={focusNode} {saveNode} {exitNode} />
+        {:else if (editingLink)}
+            <LinkEditor link={focusLink} {saveLink} {exitLink} />
         {/if}
     </div>
 

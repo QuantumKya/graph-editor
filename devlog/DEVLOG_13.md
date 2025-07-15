@@ -38,3 +38,8 @@ Then I added a link and some other simple code, and boom! It's done. I have an `
 ![New Menu](img/devlog_13_new_menu.png)
 
 With that done, my three tiny goals are finished! Now on to bigger ones.
+
+<br>
+<br>
+
+[<-- Previous Devlog](DEVLOG_12.md)   [Next Devlog -->](DNA_DEVLOG_14.md)

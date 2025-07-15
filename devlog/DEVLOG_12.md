@@ -13,4 +13,4 @@ I have two helper functions for saving the state.
 <br>
 <br>
 
-[<-- Previous Devlog](DEVLOG_11.md)<!--   [Next Devlog --\>](DNA_DEVLOG_13.md)-->
+[<-- Previous Devlog](DEVLOG_11.md)   [Next Devlog -->](DNA_DEVLOG_13.md)
