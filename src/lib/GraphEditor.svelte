@@ -9,6 +9,8 @@
     import EditLogger from './EditLogger.svelte';
     import UndoRedo from './UndoRedo.svelte';
 
+    type MNode = typeof graphData["nodes"][0];
+
     const cloneDatum = (datum: typeof graphData) => {
         return {
             nodes: datum.nodes.map(node => ({ ...node, position: [...node.position] })),
@@ -57,11 +59,11 @@
 
     let imageBuffer: HTMLImageElement[] = [];
 
-    let focusNode: typeof graphData["nodes"][0] = $state(graphData["nodes"][0]);
+    let focusNode: MNode = $state(graphData["nodes"][0]);
     let draggingNode: boolean = $state(false);
     let editingNode: boolean = $state(false);
 
-    let linkNode: typeof graphData["nodes"][0];
+    let linkNode: MNode;
     let linkingNode: boolean = $state(false);
 
     let mode: number = 0;
@@ -87,8 +89,8 @@
 
         data["links"].forEach((link) => {
             ctx.beginPath();
-            const node1 = data["nodes"][link["from"]];
-            const node2 = data["nodes"][link["to"]];
+            const node1 = data["nodes"].find(node => node.id === link["from"]) ?? data["nodes"][0];
+            const node2 = data["nodes"].find(node => node.id === link["to"]) ?? data["nodes"][0];
             ctx.moveTo(node1.position[0] - translation.x, node1.position[1] - translation.y);
             ctx.lineTo(node2.position[0] - translation.x, node2.position[1] - translation.y);
             ctx.lineWidth = 10;
@@ -97,8 +99,6 @@
         });
 
         data["nodes"].forEach((node, index) => {
-            imageBuffer[index].src = node.image;
-            
             const pos = Victor.fromArray(node.position).subtract(translation);
             const imgWidth = 25;
 
@@ -147,8 +147,36 @@
         
         // toolbar action
         if (event.button === 0) {
+            // node adding
+            if (mode === 0) {
+                if (!node) {
+                    data["nodes"].push({ id: -1, name: "", description: "", image: "", position: pos.toArray() });
+                    updateIDs();
+                    imageBuffer.push(new Image());
+                    update();
+                    logger.log("Create node");
+                }
+                else if (window.confirm("Delete node and its links?")) {
+                    const id = node.id;
+                    data["nodes"].splice(id, 1);
+                    focusNode = data["nodes"][0];
+                    imageBuffer.splice(id, 1);
+
+                    let killList: number[] = [];
+                    data["links"].forEach((link, i) => {
+                        if (link.from === id || link.to === id) {
+                            killList.push(i);
+                        }
+                    });
+                    for (const i of killList) data["links"].splice(i, 1);
+
+                    updateIDs();
+                    update();
+                    logger.log("Delete node", `Node ID: ${id}, ${killList.length} links destroyed`);
+                }
+            }
             // node editing
-            if (mode === 1) { if (!node) return;
+            else if (mode === 1) { if (!node) return;
                 editingNode = true;
             }
             // node dragging
@@ -315,6 +343,18 @@
         logger.redo();
         console.log(stateBuffer);
         console.log(backPace);
+    };
+
+
+    const updateIDs = () => {
+        const key = new Map(data["nodes"].map((node, i) => [node.id, i]));
+        data["nodes"].forEach((node, i) => node.id = i);
+        data["links"].forEach(link => {
+            console.log(`${link.from}, ${link.to}`);
+            link.from = key.get(link.from) ?? link.from;
+            link.to = key.get(link.to) ?? link.to;
+            console.log(`${link.from}, ${link.to}`);
+        });
     };
 
     onMount(() => {

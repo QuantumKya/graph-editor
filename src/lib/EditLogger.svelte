@@ -41,8 +41,8 @@
 <div class="flex flex-col gap-0 absolute w-fit p-1 rounded-xl bottom-1 left-1 font-mono text-blue-300 bg-gray-700">
     <p class="text-center"> ------------------ Edit Log ------------------ </p>
     
-    <textarea class="resize-none h-[200px] max-h-[350px] overflow-y-scroll text-wrap outline-none"
-        readonly cols=48
+    <textarea class="resize-none overflow-y-scroll text-wrap outline-none"
+        readonly cols=48 rows=8
         bind:this={logArea}>
     </textarea>
 </div>
