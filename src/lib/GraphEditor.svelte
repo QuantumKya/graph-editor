@@ -239,8 +239,21 @@
     };
 
     const onkeydown = (event: KeyboardEvent) => {
-        if (event.key == "Escape") {
+        if (event.key === "Escape") {
             if (linkingNode) linkingNode = false;
+        }
+
+        if (event.key === "o") {
+            if (window.confirm("Download new JSON?")) {
+                const json = JSON.stringify(data, null, 4);
+                const blob = new Blob([json], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'data.json';
+                a.click();
+                URL.revokeObjectURL(url);
+            }
         }
     };
 
