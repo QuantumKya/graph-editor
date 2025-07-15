@@ -28,3 +28,13 @@ I added the code for adding and removing nodes, and then had to make a function 
 There are currently a few odd edge cases where deleting a node causes some links to jump to other nodes. I don't know how to fix this at the moment, but I will at some point.
 
 ### Wiki links
+
+To replace descriptions with wiki links, I commented out the description editor and its related variables. I commented it out instead of deleting it because I need it later for the link editor.
+
+![Debris](img/devlog_13_debris.png)
+
+Then I added a link and some other simple code, and boom! It's done. I have an `addend` field in case a page needs disambiguation, as in the case of `https://en.wikipedia.org/wiki/Division_(mathematics)`.
+
+![New Menu](img/devlog_13_new_menu.png)
+
+With that done, my three tiny goals are finished! Now on to bigger ones.

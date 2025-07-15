@@ -6,20 +6,30 @@
     const node = nodes[node_id];
     
     let nodeTitle: string = $state(node.name);
-    let nodeDesc: string = $state(node.description);
+    let linkAddend: string = $state('');
+    let wikiLink: string = $derived.by(() => {
+        if (nodeTitle.length === 0 ) return '';
+        let name = nodeTitle;
+        name = name.at(0)?.toUpperCase() + name.slice(1).toLowerCase();
+        let arr = name.split(' ');
+        if (linkAddend !== '') arr.push(linkAddend);
+        return arr.join('_');
+    });
     
     let nodeImage: string = $state(node.image);
     let imageupload: HTMLInputElement;
 
     let titletype: HTMLInputElement;
-    let desctype: HTMLTextAreaElement;
+    let addendtype: HTMLInputElement;
+    //let desctype: HTMLTextAreaElement;
 
     let changed: boolean = false;
     let saved: boolean = false;
     
     onMount(() => {
         titletype.value = node.name;
-        desctype.value = node.description;
+        addendtype.value = node.addend;
+        //desctype.value = node.description;
     });
 
     const onchange = () => {
@@ -63,17 +73,26 @@
         <img src="{base}/landscape-placeholder.svg" alt="Uploaded Icon" class="rounded-lg w-[300px]"/>
     {/if}
 
-
+    <!--
     <textarea rows="6" maxlength="400" class="{text_input_css} placeholder:text-neutral-400 resize-none overflow-scroll" placeholder="Node Description"
         {onchange}
         bind:this={desctype}
         bind:value={nodeDesc}
     ></textarea>
+    -->
+
+    <input type="text" class="{text_input_css}" placeholder="Link Addend"
+        {onchange}
+        bind:this={addendtype}
+        bind:value={linkAddend}
+    >
+
+    <a href="https://en.wikipedia.org/wiki/{wikiLink}" class="underline">Wikipedia</a>
     
 
     <div class="relative inline-block h-fit">
         <button class="{btn_css} float-left"
-            onclick={() => { saved = saveNode(node_id, nodeTitle, nodeDesc, nodeImage); }}
+            onclick={() => { saved = saveNode(node_id, nodeTitle, linkAddend, nodeImage); }}
         >Save</button>
         
         <button class="{btn_css} float-right"

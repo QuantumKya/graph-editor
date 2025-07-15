@@ -150,7 +150,7 @@
             // node adding
             if (mode === 0) {
                 if (!node) {
-                    data["nodes"].push({ id: -1, name: "", description: "", image: "", position: pos.toArray() });
+                    data["nodes"].push({ id: -1, name: "", addend: "", image: "", position: pos.toArray() });
                     updateIDs();
                     imageBuffer.push(new Image());
                     update();
@@ -286,10 +286,10 @@
     };
 
     
-    const saveNode = (id: number, title: string, desc: string, img: string): boolean => {
+    const saveNode = (id: number, title: string, add: string, img: string): boolean => {
         let checkArray = [
-            data["nodes"][id].name === title ? "" : "name", 
-            data["nodes"][id].description === desc ? "" : "description",
+            data["nodes"][id].name === title ? "" : "name",
+            data["nodes"][id].addend === add ? "" : "addend",
             data["nodes"][id].image === img ? "" : "image"
         ];
         
@@ -303,7 +303,7 @@
         if (!window.confirm("Save this node with new contents?")) return false;
         
         data["nodes"][id].name = title;
-        data["nodes"][id].description = desc;
+        data["nodes"][id].addend = add;
         data["nodes"][id].image = img;
 
         update();
