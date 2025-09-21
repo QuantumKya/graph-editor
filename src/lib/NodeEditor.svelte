@@ -5,28 +5,27 @@
     const { node, saveNode, exitNode } = $props();
     
     let nodeTitle: string = $state(node.name);
+    /*
     let linkAddend: string = $state('');
     let wikiLink: string = $derived.by(() => {
         if (nodeTitle.length === 0 ) return '';
         let name = nodeTitle;
         name = name.at(0)?.toUpperCase() + name.slice(1).toLowerCase();
         let arr = name.split(' ');
-        if (linkAddend !== '') arr.push(linkAddend);
         return arr.join('_');
     });
+    */
     
     let nodeImage: string = $state(node.image);
     let imageupload: HTMLInputElement;
 
     let titletype: HTMLInputElement;
-    let addendtype: HTMLInputElement;
 
     let changed: boolean = false;
     let saved: boolean = false;
     
     onMount(() => {
         titletype.value = node.name;
-        addendtype.value = node.addend;
     });
 
     const onchange = () => {
@@ -70,6 +69,7 @@
         <img src="{base}/landscape-placeholder.svg" alt="Uploaded Icon" class="rounded-lg w-[300px]"/>
     {/if}
 
+    <!--
     <input type="text" class="{text_input_css}" placeholder="Link Addend"
         {onchange}
         bind:this={addendtype}
@@ -77,11 +77,12 @@
     >
 
     <a href="https://en.wikipedia.org/wiki/{wikiLink}" class="underline">Wikipedia</a>
+    -->
     
 
     <div class="relative inline-block h-fit">
         <button class="{btn_css} float-left"
-            onclick={() => { saved = saveNode(node, nodeTitle, linkAddend, nodeImage); }}
+            onclick={() => { saved = saveNode(node, nodeTitle, nodeImage); }}
         >Save</button>
         
         <button class="{btn_css} float-right"

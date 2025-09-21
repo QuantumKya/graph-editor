@@ -83,9 +83,11 @@
         canvas.height = window.innerHeight;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+        ctx.setTransform(zoom, 0, 0, zoom, -translation.x, -translation.y);
+
         if (linkingNode) {
             ctx.beginPath();
-            ctx.moveTo(focusNode.position[0] - translation.x, focusNode.position[1] - translation.y);
+            ctx.moveTo(focusNode.position[0], focusNode.position[1]);
             ctx.lineTo(lastMousePos.x, lastMousePos.y);
             ctx.lineWidth = 10;
             ctx.strokeStyle = `rgba(0, 0, 0, 0.35)`;
@@ -96,15 +98,15 @@
             ctx.beginPath();
             const node1 = data["nodes"].find(node => node.id === link["from"]) ?? data["nodes"][0];
             const node2 = data["nodes"].find(node => node.id === link["to"]) ?? data["nodes"][0];
-            ctx.moveTo(node1.position[0] - translation.x, node1.position[1] - translation.y);
-            ctx.lineTo(node2.position[0] - translation.x, node2.position[1] - translation.y);
+            ctx.moveTo(node1.position[0], node1.position[1]);
+            ctx.lineTo(node2.position[0], node2.position[1]);
             ctx.lineWidth = 10;
             ctx.strokeStyle = "black";
             ctx.stroke();
         });
 
         data["nodes"].forEach((node, index) => {
-            const pos = Victor.fromArray(node.position).subtract(translation);
+            const pos = Victor.fromArray(node.position);
             const imgWidth = 25;
 
             ctx.beginPath();
@@ -119,6 +121,11 @@
         });
 
         requestAnimationFrame(draw);
+    };
+
+    const getScreenMousePos = (event: MouseEvent) => {
+        const rect = canvas.getBoundingClientRect();
+        return new Victor(event.clientX - rect.left, event.clientY - rect.top);
     };
 
     const getMousePos = (event: MouseEvent) => {
@@ -163,7 +170,7 @@
             // node adding
             if (mode === 0) {
                 if (!node) {
-                    data["nodes"].push({ id: -1, name: "", addend: "", image: "", position: pos.toArray() });
+                    data["nodes"].push({ id: -1, name: "", image: "", position: pos.toArray() });
                     updateIDs();
                     imageBuffer.push(new Image());
                     update();
@@ -230,7 +237,7 @@
         // dragging canvas
         if (event.button === 2) {
             draggingCanvas = true;
-            dragStartMouse = pos;
+            dragStartMouse = getScreenMousePos(event);
             dragStartTranslation = translation.clone();
         }
     };
@@ -238,17 +245,16 @@
     const onmousemove = (event: MouseEvent) => {
         if (editingNode) return;
         
-        const pos = getMousePos(event);
-        lastMousePos = pos;
+        const worldPos = getMousePos(event);
+        lastMousePos = worldPos;
 
         if (draggingNode) {
             let node = data["nodes"].find(n => n.id === focusNode.id);
-            if (node === undefined) throw new Error("uhhh focusNode error, it's not in the list...");
-            else {
-                node.position = pos.clone().subtract(dragOffset).toArray();
-            }
+            if (!node) throw new Error("uhhh focusNode error, it's not in the list...");
+            node.position = worldPos.clone().subtract(dragOffset).toArray();
         }
         else if (draggingCanvas) {
+            const pos = getScreenMousePos(event);
             const dMouse = pos.clone().subtract(dragStartMouse);
             translation = dragStartTranslation.clone().subtract(dMouse);
         }
@@ -268,39 +274,28 @@
     
     const onwheel = (event: WheelEvent) => {
         event.preventDefault();
-        
-        /*
-        const change = Math.sign(event.deltaY);
 
+        const screenPos = getScreenMousePos(event);
+        const world = screenPos.clone().add(translation).divideScalar(zoom);
+
+        const change = Math.sign(event.deltaY);
         zoom -= change * 0.125;
         zoom = Math.max(minZoom, Math.min(maxZoom, zoom));
-        */
+
+        const worldNew = world.clone().multiplyScalar(zoom).subtract(screenPos);
+        translation = worldNew;
     };
 
     const onkeydown = (event: KeyboardEvent) => {
         if (event.key === "Escape") {
             if (linkingNode) linkingNode = false;
         }
-
-        if (event.key === "o") {
-            if (window.confirm("Download new JSON?")) {
-                const json = JSON.stringify(data, null, 4);
-                const blob = new Blob([json], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'data.json';
-                a.click();
-                URL.revokeObjectURL(url);
-            }
-        }
     };
 
     
-    const saveNode = (node: MNode, title: string, add: string, img: string): boolean => {
+    const saveNode = (node: MNode, title: string, img: string): boolean => {
         let checkArray = [
             node.name === title ? "" : "name",
-            node.addend === add ? "" : "addend",
             node.image === img ? "" : "image"
         ];
         
@@ -314,8 +309,12 @@
         if (!window.confirm("Save this node with new contents?")) return false;
         
         node.name = title;
-        node.addend = add;
         node.image = img;
+
+        const index = data.nodes.indexOf(node);
+        if (index >= 0) {
+            imageBuffer[index].src = node.image;
+        }
 
         update();
         logger.log("Update node contents", checkString);
@@ -384,6 +383,22 @@
         console.log(backPace);
     };
 
+    
+    const saveGraph = () => {
+        if (window.confirm("Download new JSON?")) {
+            const json = JSON.stringify(data, null, 4);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'data.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    };
+
+    let graphupload: HTMLInputElement;
+
 
     const updateIDs = () => {
         const key = new Map(data["nodes"].map((node, i) => [node.id, i]));
@@ -416,6 +431,40 @@
         {:else if (editingLink)}
             <LinkEditor link={focusLink} {saveLink} {exitLink} />
         {/if}
+    </div>
+
+    <div class="absolute right-2.5 bottom-2.5">
+        <button class="bg-neutral-800 text-white border-blue-500 text-center rounded-xl border-2 w-fit p-2 pt-1 transition duration-200 hover:bg-gray-700" aria-label="Save Graph"
+        onclick={saveGraph}>Save Graph</button>
+        <button class="bg-neutral-800 text-white border-blue-500 text-center rounded-xl border-2 w-fit p-2 pt-1 transition duration-200 hover:bg-gray-700" aria-label="Load Graph"
+        onclick={(event) => graphupload.click()}>Load Graph</button>
+        <input type="file" accept=".json" style:display="none" bind:this={graphupload} onchange={(event) => {
+            const input = event.target as HTMLInputElement;
+            if (!input.files || input.files.length === 0) return;
+
+            const file: File = input.files[0];
+
+            const reader = new FileReader();
+            reader.onload = () => {
+                if (typeof reader.result === "string") {
+                    try {
+                        const json = JSON.parse(reader.result);
+                        if (!json.nodes || !json.links) throw new Error("Invalid graph data");
+                        data = cloneDatum(json);
+                        updateIDs();
+                        backPace = 1;
+                        stateBuffer = [cloneDatum(data)];
+                        setState();
+                        logger.log("Load new graph data");
+                    } catch (e: Error | any) {
+                        alert("Failed to load graph: " + e.message);
+                    }
+                }
+            };
+
+            reader.readAsText(file);
+        }}
+        />
     </div>
 
     <EditLogger bind:this={logger} />
