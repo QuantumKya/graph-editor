@@ -1,4 +1,4 @@
-# Math Map
+# Graph Editor
 
 A graph editor with customizable names and descriptions for every node and edge.
 
