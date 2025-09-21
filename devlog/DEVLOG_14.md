@@ -18,4 +18,4 @@ It was pretty easy to make the menu and get it all working, so here it is!!!
 <br>
 <br>
 
-[<-- Previous Devlog](DEVLOG_13.md)<!--   [Next Devlog --\>](DNA_DEVLOG_15.md)-->
+[<-- Previous Devlog](DEVLOG_13.md)   [Next Devlog -->](DEVLOG_15.md)

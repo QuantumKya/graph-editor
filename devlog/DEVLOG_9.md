@@ -15,4 +15,4 @@ Next is to fill in messages where they should be sent and, of course, fix any is
 <br>
 <br>
 
-[<-- Previous Devlog](DEVLOG_8.md)   [Next Devlog -->](DNA_DEVLOG_10.md)
+[<-- Previous Devlog](DEVLOG_8.md)   [Next Devlog -->](DEVLOG_10.md)

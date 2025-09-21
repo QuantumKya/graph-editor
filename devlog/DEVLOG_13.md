@@ -42,4 +42,4 @@ With that done, my three tiny goals are finished! Now on to bigger ones.
 <br>
 <br>
 
-[<-- Previous Devlog](DEVLOG_12.md)   [Next Devlog -->](DNA_DEVLOG_14.md)
+[<-- Previous Devlog](DEVLOG_12.md)   [Next Devlog -->](DEVLOG_14.md)

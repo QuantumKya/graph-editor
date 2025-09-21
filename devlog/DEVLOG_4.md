@@ -9,4 +9,4 @@ I've also been working on a toolbar at the bottom of the screen for switching be
 <br>
 <br>
 
-[<-- Previous Devlog](DEVLOG_3.md)   [Next Devlog -->](DNA_DEVLOG_5.md)
+[<-- Previous Devlog](DEVLOG_3.md)   [Next Devlog -->](DEVLOG_5.md)

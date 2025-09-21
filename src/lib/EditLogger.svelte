@@ -8,6 +8,7 @@
     let actionLog: string[] = $state([]);
 
     let open: boolean = $state(true);
+    let menu: HTMLDivElement;
 
     export const log = (action: string, detail?: string) => {
         if (backPace > 0) {
@@ -40,13 +41,15 @@
     });
 </script>
 
+<!--
 {#if open}
-<button onclick={(event) => { open = false;  }} aria-label="Close Menu" class="text-xs"><i class="fa-solid fa-chevron-down"></i></button>
+<button onclick={(event) => { open = false; menu.style.bottom = '-300px'; }} aria-label="Close Menu" class="text-xs"><i class="fa-solid fa-chevron-down"></i></button>
 {:else}
-<button onclick={(event) => open = true} aria-label="Open Menu" class="text-xs"><i class="fa-solid fa-chevron-up"></i></button>
+<button onclick={(event) => { open = true; menu.style.bottom = '0px'; }} aria-label="Open Menu" class="text-xs"><i class="fa-solid fa-chevron-up"></i></button>
 {/if}
+-->
 
-<div class="flex flex-col gap-0 absolute w-fit p-1 rounded-xl bottom-1 left-1 font-mono text-blue-300 bg-gray-700 transition duration-200">
+<div class="flex flex-col gap-0 absolute w-fit p-1 rounded-xl bottom-1 left-1 font-mono text-blue-300 bg-gray-700 transition duration-200" bind:this={menu}>
     <p class="text-center"> ------------------ Edit Log ------------------ </p>
     
     <textarea class="resize-none overflow-y-scroll text-wrap outline-none"

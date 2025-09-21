@@ -31,4 +31,4 @@ Oh, hi! I was talking about the node links, though, not you guys.
 <br>
 <br>
 
-[<-- Previous Devlog](DEVLOG_7.md)   [Next Devlog -->](DNA_DEVLOG_9.md)
+[<-- Previous Devlog](DEVLOG_7.md)   [Next Devlog -->](DEVLOG_9.md)

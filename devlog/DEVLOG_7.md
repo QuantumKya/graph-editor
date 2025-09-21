@@ -18,4 +18,4 @@ Currently the buttons don't *do* anything, but that's coming up next!
 <br>
 <br>
 
-[<-- Previous Devlog](DEVLOG_6.md)   [Next Devlog -->](DNA_DEVLOG_8.md)
+[<-- Previous Devlog](DEVLOG_6.md)   [Next Devlog -->](DEVLOG_8.md)
