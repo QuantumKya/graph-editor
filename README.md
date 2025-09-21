@@ -1,6 +1,6 @@
-# Math Map
+# Graph Editor
 
-A large, interactive map of different mathematical concepts and how they are related.
+A graph editor with customizable names and descriptions for every node and edge.
 
 Programmed in Svelte for Hack Club's Summer of Making program.
 
@@ -8,4 +8,3 @@ Read the devlogs [here](devlog/DEVLOG_1.md)!
 
 TO-DO:
 - Lock the toolbar when in the middle of an action
-- Add zooming
