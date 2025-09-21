@@ -44,6 +44,11 @@
     >
 
 
+    {#if nodeImage != ""}
+        <img src={nodeImage} alt="Uploaded Icon" class="rounded-lg w-[150px]"/>
+    {:else}
+        <img src="{base}/landscape-placeholder.svg" alt="Uploaded Icon" class="rounded-lg w-[150px]"/>
+    {/if}
     <button class="{btn_css}" onclick={(event) => { imageupload.click(); }}
     >Upload Image</button>
     <input type="file" accept="image/*" style:display="none" bind:this={imageupload} onchange={(event) => {
@@ -63,11 +68,6 @@
         onchange();
     }}
     />
-    {#if nodeImage != ""}
-        <img src={nodeImage} alt="Uploaded Icon" class="rounded-lg w-[300px]"/>
-    {:else}
-        <img src="{base}/landscape-placeholder.svg" alt="Uploaded Icon" class="rounded-lg w-[300px]"/>
-    {/if}
 
     <!--
     <input type="text" class="{text_input_css}" placeholder="Link Addend"

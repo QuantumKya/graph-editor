@@ -1,6 +1,5 @@
 <script lang="ts">
     import { base } from '$app/paths';
-    import { createEventDispatcher } from 'svelte';
 
     let mode = $state(2);
     let mode_icons: string[] = [
@@ -12,10 +11,10 @@
         'link_edit.png',
     ];
 
-    const dispatch = createEventDispatcher();
+    let { modeChanged } = $props();
 
     $effect(() => {
-        dispatch('modeChanged', mode);
+        modeChanged(mode);
     });
 </script>
 

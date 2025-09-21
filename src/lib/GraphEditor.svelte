@@ -9,6 +9,7 @@
     import EditLogger from './EditLogger.svelte';
     import UndoRedo from './UndoRedo.svelte';
     import LinkEditor from './LinkEditor.svelte';
+  import Controls from './Controls.svelte';
 
     type MNode = typeof graphData["nodes"][0];
     type MLink = typeof graphData["links"][0];
@@ -71,7 +72,7 @@
     let linkNode: MNode;
     let linkingNode: boolean = $state(false);
 
-    let mode: number = 0;
+    let mode: number = $state(0);
 
     let logger: EditLogger;
 
@@ -398,6 +399,7 @@
     };
 
     let graphupload: HTMLInputElement;
+    let modepicker: ModePicker;
 
 
     const updateIDs = () => {
@@ -425,7 +427,7 @@
         oncontextmenu={event => event.preventDefault()}
     ></canvas>
 
-    <div class="absolute right-2.5 top-2.5">
+    <div class="absolute right-2.5 bottom-15">
         {#if (editingNode)}
             <NodeEditor node={focusNode} {saveNode} {exitNode} />
         {:else if (editingLink)}
@@ -467,9 +469,12 @@
         />
     </div>
 
+    
     <EditLogger bind:this={logger} />
-
+    
     <UndoRedo {undo} {redo} />
-
-    <ModePicker on:modeChanged={(e) => mode = e.detail} />
+    
+    <ModePicker modeChanged={(m: number) => mode = m} bind:this={modepicker} />
+    
+    <Controls bind:mode={mode}/>
 </div>
