@@ -1,4 +1,4 @@
-## Devlog #15 - 7/8/2025
+## Devlog #15 - 9/21/2025
 # A Different Direction
 
 Since Summer of Making is almost over, I decided to take this project and see what I could make of it in such short time. Since I've made so much infrastructure for graph editing, I'm making it a graph editor! Hope that isn't disappointing.
@@ -10,4 +10,4 @@ Speaking of actual changes, I've fixed the dragging and zooming!!! Also, there a
 <br>
 <br>
 
-[<-- Previous Devlog](DEVLOG_14.md)<!--   [Next Devlog --\>](DEVLOG_16.md)-->
+[<-- Previous Devlog](DEVLOG_14.md)   [Next Devlog -->](DEVLOG_16.md)
