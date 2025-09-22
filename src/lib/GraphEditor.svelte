@@ -291,6 +291,13 @@
         if (event.key === "Escape") {
             if (linkingNode) linkingNode = false;
         }
+
+        if (event.ctrlKey) {
+            if (event.key === "o") { event.preventDefault(); graphupload.click(); }
+            if (event.key === "s") { event.preventDefault(); saveGraph(); }
+            if (event.key === "z") undo();
+            if (event.key === "y") redo();
+        }
     };
 
     
