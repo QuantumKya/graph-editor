@@ -5,30 +5,34 @@
 		<link rel="icon" href="./favicon.svg" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		
-		<link href="./_app/immutable/assets/0.CZ1qrRqL.css" rel="stylesheet">
-		<link rel="modulepreload" href="./_app/immutable/entry/start.CZZjozwa.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/BZuzMfIh.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/DoBE4cx5.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/DJWGDQ8C.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/B8_5t7wu.js">
-		<link rel="modulepreload" href="./_app/immutable/entry/app.DeKnHTRm.js">
+		<link href="./_app/immutable/assets/0.BlROHdx7.css" rel="stylesheet">
+		<link rel="modulepreload" href="./_app/immutable/entry/start.NrLk-y-n.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/DTRGCwao.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/DsjGDbIo.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/BeWt66ZE.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/9tEt_Nny.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/BrUvtmUO.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/Df33kf_W.js">
+		<link rel="modulepreload" href="./_app/immutable/entry/app.oFTNC7km.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/CWj6FrbW.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/D6yf63is.js">
-		<link rel="modulepreload" href="./_app/immutable/nodes/0.De9ImZnD.js">
-		<link rel="modulepreload" href="./_app/immutable/nodes/2.6CaXzoXl.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/68dL1qPk.js"><!--[--><style>
+		<link rel="modulepreload" href="./_app/immutable/chunks/CKogC_md.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/D_Y7g2-O.js">
+		<link rel="modulepreload" href="./_app/immutable/nodes/0.BHggagvl.js">
+		<link rel="modulepreload" href="./_app/immutable/nodes/2.Cc_sXAe4.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/YDYzQb7I.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/DGEL4HPb.js"><!--[--><style>
         body {
+            background-color: #DDD;
             overflow-y: hidden;
         }
-    </style><!--]--><title>Graph Editor</title>
+    </style><!--]-->
 	</head>
 	<body data-sveltekit-preload-data="hover">
-		<div style="display: contents"><!--[--><!--[--><!----><!----><div id="canvas-box" class="relative inline-block overflow-hidden"><canvas class="bg-neutral-100" tabindex="0"></canvas> <div class="absolute right-2.5 bottom-15"><!--[!--><!--]--></div> <div class="absolute right-2.5 bottom-2.5"><button class="bg-neutral-800 text-white border-blue-500 text-center rounded-xl border-2 w-fit p-2 pt-1 transition duration-200 hover:bg-gray-700" aria-label="Save Graph">Save Graph</button> <button class="bg-neutral-800 text-white border-blue-500 text-center rounded-xl border-2 w-fit p-2 pt-1 transition duration-200 hover:bg-gray-700" aria-label="Load Graph">Load Graph</button> <input type="file" accept=".json" style="display: none;"/></div> <div class="absolute bottom-1 left-1 transition duration-200"><!--[--><button aria-label="Close Menu"><i class="fa-solid fa-chevron-down"></i></button><!--]--> <div class="flex flex-col gap-0 w-fit p-1 rounded-xl font-mono text-blue-300 bg-gray-700"><p class="text-center">------------------ Edit Log ------------------</p> <textarea class="resize-none overflow-y-scroll text-wrap outline-none" readonly cols="48" rows="8">
-        </textarea></div></div><!----> <div class="flex flex-row gap-3 w-min h-min p-3 absolute top-1 left-1 text-2xl"><button class="border-none rounded-full w-fit h-fit bg-gray-300 p-2 pt-0.5 pb-1 text-center" aria-label="Undo"><i class="fas fa-undo"></i></button> <button class="border-none rounded-full w-fit h-fit bg-gray-300 p-2 pt-0.5 pb-1 text-center" aria-label="Redo"><i class="fas fa-redo"></i></button></div><!----> <div class="flex absolute rounded-xl bg-neutral-200 border-blue-300 border-2 p-[10px] pt-[5px] pb-[5px] h-fit bottom-6 left-[50%] transform -translate-[50%]"><!--[--><!--[!--><button class="p-2.5 rounded-xl border-none outline-none transition duration-200 hover:bg-blue-300 mt-[10px] mb-[10px]"><img src="./mode_icons/node_add.png" alt="node_add" class="max-w-[30px] rounded-lg"/></button><!--]--><!--[!--><button class="p-2.5 rounded-xl border-none outline-none transition duration-200 hover:bg-blue-300 mt-[10px] mb-[10px]"><img src="./mode_icons/node_edit.png" alt="node_edit" class="max-w-[30px] rounded-lg"/></button><!--]--><!--[!--><button class="p-2.5 rounded-xl border-none outline-none transition duration-200 hover:bg-blue-300 bg-gray-500 mt-auto mb-auto"><img src="./mode_icons/node_drag.png" alt="node_drag" class="max-w-[40px] rounded-xl"/></button><!--]--><!--[--><div class="w-[5px] bg-neutral-300 rounded-full m-3"></div><!--]--><!--[!--><button class="p-2.5 rounded-xl border-none outline-none transition duration-200 hover:bg-blue-300 mt-[10px] mb-[10px]"><img src="./mode_icons/link_add.png" alt="link_add" class="max-w-[30px] rounded-lg"/></button><!--]--><!--[!--><button class="p-2.5 rounded-xl border-none outline-none transition duration-200 hover:bg-blue-300 mt-[10px] mb-[10px]"><img src="./mode_icons/link_edit.png" alt="link_edit" class="max-w-[30px] rounded-lg"/></button><!--]--><!--]--></div><!----> <div class="absolute right-1 top-1 transition duration-200"><div class="bg-neutral-200 border-blue-300 border-4 p-3 pr-10 pb-6 rounded-lg"><h1 class="text-2xl">Controls</h1> <!--[--><p class="pl-2"><strong>Ctrl-Z</strong> — undo</p><p class="pl-2"><strong>Ctrl-Y</strong> — redo</p><p class="pl-2"><strong>Ctrl-S</strong> — save</p><p class="pl-2"><strong>Ctrl-O</strong> — open</p><!--]--> <br/> <h2>Mode-Specific Controls — Add Node</h2> <!--[--><p class="pl-2"><strong>Left Click</strong> — create a new node</p><p class="pl-2"><strong>Left Click (on existing node)</strong> — delete selected node</p><!--]--></div> <!--[--><button aria-label="Close Menu"><i class="fa-solid fa-chevron-up"></i></button><!--]--></div><!----></div><!----><!----><!----><!--]--> <!--[!--><!--]--><!--]-->
+		<div style="display: contents"><!--[--><!--[--><!----><!----><p class="absolute left-[50%] -translate-x-[calc(50%+175px)] top-[50%] -translate-y-[calc(50%+175px)] -rotate-[5deg] z-10 text-black text-5xl font-semibold">quantumKya's</p> <img src="graph.png" alt="Graph" class="-z-10 absolute pointer-events-none left-[50%] -translate-x-[calc(50%-50px)] top-[50%] -translate-y-[calc(50%+100px)]"/> <div class="absolute w-fit h-fit left-[50%] -translate-x-[50%] top-[50%] -translate-y-[50%] flex flex-row gap-10 text-2xl"><button class="bg-neutral-800 text-white border-blue-500 text-center rounded-xl border-2 w-fit p-4 pb-2 pt-1 transition duration-200 hover:bg-gray-700" aria-label="Make Graph">Make Graph</button> <a class="hidden" aria-label="/make" href="./make"></a> <button class="bg-neutral-800 text-white border-blue-500 text-center rounded-xl border-2 w-fit p-4 pb-2 pt-1 transition duration-200 hover:bg-gray-700" aria-label="View Graph">View Graph</button> <a class="hidden" aria-label="/view" href="./view"></a></div><!----><!----><!----><!--]--> <!--[!--><!--]--><!--]-->
 			
 			<script>
 				{
-					__sveltekit_klrlbv = {
+					__sveltekit_l7wyk3 = {
 						base: new URL(".", location).pathname.slice(0, -1),
 						assets: "/math-map"
 					};
@@ -36,8 +40,8 @@
 					const element = document.currentScript.parentElement;
 
 					Promise.all([
-						import("./_app/immutable/entry/start.CZZjozwa.js"),
-						import("./_app/immutable/entry/app.DeKnHTRm.js")
+						import("./_app/immutable/entry/start.NrLk-y-n.js"),
+						import("./_app/immutable/entry/app.oFTNC7km.js")
 					]).then(([kit, app]) => {
 						kit.start(app, element, {
 							node_ids: [0, 2],

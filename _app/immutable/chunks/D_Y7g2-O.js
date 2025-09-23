@@ -1,0 +1,1 @@
+import{O as S,P as h,Q as k,R as O,S as T}from"./BeWt66ZE.js";function t(r,i){return r===i||(r==null?void 0:r[T])===i}function x(r={},i,a,c){return S(()=>{var f,s;return h(()=>{f=s,s=[],O(()=>{r!==a(...s)&&(i(r,...s),f&&t(a(...f),r)&&i(null,...f))})}),()=>{k(()=>{s&&t(a(...s),r)&&i(null,...s)})}}),r}export{x as b};
