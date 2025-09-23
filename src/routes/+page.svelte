@@ -8,6 +8,8 @@
 </svelte:head>
 
 <script lang="ts">
+  import { base } from "$app/paths";
+
     let makelink: HTMLAnchorElement;
     let viewlink: HTMLAnchorElement;
 </script>
@@ -19,8 +21,8 @@
 <div class="absolute w-fit h-fit left-[50%] -translate-x-[50%] top-[50%] -translate-y-[50%] flex flex-row gap-10 text-2xl">
     <button class="bg-neutral-800 text-white border-blue-500 text-center rounded-xl border-2 w-fit p-4 pb-2 pt-1 transition duration-200 hover:bg-gray-700"
     onclick={(e) => makelink.click()} aria-label="Make Graph">Make Graph</button>
-    <a bind:this={makelink} class="hidden" aria-label="/make" href="/make"></a>
+    <a bind:this={makelink} class="hidden" aria-label="/make" href="{base}/make"></a>
     <button class="bg-neutral-800 text-white border-blue-500 text-center rounded-xl border-2 w-fit p-4 pb-2 pt-1 transition duration-200 hover:bg-gray-700"
     onclick={(e) => viewlink.click()} aria-label="View Graph">View Graph</button>
-    <a bind:this={viewlink} class="hidden" aria-label="/view" href="/view"></a>
+    <a bind:this={viewlink} class="hidden" aria-label="/view" href="{base}/view"></a>
 </div>
