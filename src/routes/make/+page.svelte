@@ -1,25 +1,27 @@
+<svelte:head>
+    <title>Graph Editor</title>
+    <style>
+        body {
+            overflow-y: hidden;
+        }
+    </style>
+</svelte:head>
+
 <script lang="ts">
     import { onMount } from 'svelte';
     
-    import NodeEditor from './NodeEditor.svelte';
-    import ModePicker from './ModePicker.svelte';
+    import NodeEditor from '$lib/NodeEditor.svelte';
+    import ModePicker from '$lib/ModePicker.svelte';
 
     import Victor from 'victor';
-    import graphData from './nodes.json';
-    import EditLogger from './EditLogger.svelte';
-    import UndoRedo from './UndoRedo.svelte';
-    import LinkEditor from './LinkEditor.svelte';
-  import Controls from './Controls.svelte';
+    import EditLogger from '$lib/EditLogger.svelte';
+    import UndoRedo from '$lib/UndoRedo.svelte';
+    import LinkEditor from '$lib/LinkEditor.svelte';
+    import Controls from '$lib/Controls.svelte';
+    import { cloneDatum, findDistance, getMousePos, getScreenMousePos, type GraphData } from '$lib';
 
-    type MNode = typeof graphData["nodes"][0];
-    type MLink = typeof graphData["links"][0];
-
-    const cloneDatum = (datum: typeof graphData) => {
-        return {
-            nodes: datum.nodes.map(node => ({ ...node, position: [...node.position] })),
-            links: datum.links.map(link => ({ ...link }))
-        };
-    };
+    type MNode = GraphData["nodes"][0];
+    type MLink = GraphData["links"][0];
 
     const setState = () => {
         const state = stateBuffer.at(-backPace) ?? data;
@@ -36,9 +38,9 @@
         data["nodes"].forEach((node, i) => {
             imageBuffer[i].src = node.image;
         });
-        const newFocus = data["nodes"].find(n => n.id === focusNode.id);
+        const newFocus = data["nodes"].findIndex(n => n.id === focusNode);
         if (newFocus) focusNode = newFocus;
-        else focusNode = data["nodes"][0];
+        else focusNode = 0;
     };
 
     let canvas: HTMLCanvasElement;
@@ -56,17 +58,17 @@
 
     let dragOffset: Victor = new Victor(0, 0);
 
-    let data = $state(cloneDatum(graphData));
-    let stateBuffer: (typeof graphData)[] = [cloneDatum(graphData)];
+    let data: GraphData = $state({ nodes: [ { "id": 0, "name": "Node", "image": "", "position": [200, 300] } ], links: [] });
+    let stateBuffer: GraphData[] = [{ nodes: [ { "id": 0, "name": "Node", "image": "", "position": [200, 300] } ], links: [] }];
     let backPace: number = 1;
 
     let imageBuffer: HTMLImageElement[] = [];
 
-    let focusNode: MNode = $state(graphData["nodes"][0]);
+    let focusNode: number = $state(0);
     let draggingNode: boolean = $state(false);
     let editingNode: boolean = $state(false);
 
-    let focusLink: MLink = $state(graphData["links"][0]);
+    let focusLink: number = $state(0);
     let editingLink: boolean = $state(false);
 
     let linkNode: MNode;
@@ -88,7 +90,7 @@
 
         if (linkingNode) {
             ctx.beginPath();
-            ctx.moveTo(focusNode.position[0], focusNode.position[1]);
+            ctx.moveTo(data.nodes[focusNode].position[0], data.nodes[focusNode].position[1]);
             ctx.lineTo(lastMousePos.x, lastMousePos.y);
             ctx.lineWidth = 10;
             ctx.strokeStyle = `rgba(0, 0, 0, 0.35)`;
@@ -124,47 +126,21 @@
         requestAnimationFrame(draw);
     };
 
-    const getScreenMousePos = (event: MouseEvent) => {
-        const rect = canvas.getBoundingClientRect();
-        return new Victor(event.clientX - rect.left, event.clientY - rect.top);
-    };
-
-    const getMousePos = (event: MouseEvent) => {
-        const rect = canvas.getBoundingClientRect();
-        const x = (event.clientX - rect.left + translation.x) / zoom;
-        const y = (event.clientY - rect.top + translation.y) / zoom;
-        return new Victor(x, y);
-    };
-
-    const findDistance = (l1: Victor, l2: Victor, p: Victor): number => {
-        const seg = l2.clone().subtract(l1);
-        const pointPointer = p.clone().subtract(l1);
-
-        const project = pointPointer.dot(seg) / seg.lengthSq();
-
-        if (project < 0 || project > 1) return 1e6;
-
-        const parallelogramArea = Math.abs(l2.clone().subtract(l1).cross(p.clone().subtract(l1)));
-        const base = l2.clone().subtract(l1).length();
-        return parallelogramArea / base;
-    };
-
     const onmousedown = (event: MouseEvent) => {
         if (editingNode) return;
 
-        const pos = getMousePos(event);
+        const pos = getMousePos(event, canvas, translation, zoom);
         let node = data["nodes"].find(
             node => Victor.fromArray(node.position).distanceSq(pos) < 400
         );
-        focusNode = node ?? focusNode;
+        if (node) focusNode = node.id;
 
         let link = data["links"].find(lnk => {
             const n1 = data["nodes"][lnk.from];
             const n2 = data["nodes"][lnk.to];
             return findDistance(Victor.fromArray(n1.position), Victor.fromArray(n2.position), pos) < 10;
         });
-        focusLink = link ?? focusLink;
-        const link_id = data["links"].indexOf(focusLink);
+        if (link) focusLink = data.links.indexOf(link);
         
         // toolbar action
         if (event.button === 0) {
@@ -180,7 +156,7 @@
                 else if (window.confirm("Delete node and its links?")) {
                     const id = node.id;
                     data["nodes"].splice(id, 1);
-                    focusNode = data["nodes"][0];
+                    focusNode = 0;
                     imageBuffer.splice(id, 1);
 
                     let killList: number[] = [];
@@ -202,20 +178,20 @@
             }
             // node dragging
             else if (mode === 2) { if (!node) return;
-                dragOffset = pos.clone().subtract(Victor.fromArray(focusNode.position));
+                dragOffset = pos.clone().subtract(Victor.fromArray(data.nodes[focusNode].position));
                 draggingNode = true;
             }
             // link adding
             else if (mode === 3) {
                 if (node) {
                     if (linkingNode) {
-                        if (linkNode.id === focusNode.id) return;
-                        if (data["links"].filter(lnk => (lnk.from === linkNode.id && lnk.to === focusNode.id) || (lnk.from === focusNode.id && lnk.to === linkNode.id)).length !== 0) return;
-                        data["links"].push({ from: linkNode.id, to: focusNode.id, name: "", description: "" });
+                        if (linkNode.id === focusNode) return;
+                        if (data["links"].filter(lnk => (lnk.from === linkNode.id && lnk.to === focusNode) || (lnk.from === focusNode && lnk.to === linkNode.id)).length !== 0) return;
+                        data["links"].push({ from: linkNode.id, to: focusNode, name: "", description: "" });
                         linkingNode = false;
 
                         update();
-                        logger.log("Create link", `node ${linkNode.id} -> ${focusNode.id}`);
+                        logger.log("Create link", `node ${linkNode.id} -> ${focusNode}`);
                     }
                     else {
                         linkNode = node;
@@ -224,10 +200,10 @@
                     }
                 }
                 else { if (!link) return;
-                    data["links"].splice(link_id, 1);
+                    data["links"].splice(focusLink, 1);
 
                     update();
-                    logger.log("Delete link", `node ${linkNode.id} -> ${focusNode.id}`);
+                    logger.log("Delete link", `node ${linkNode.id} -> ${focusNode}`);
                 }
             }
             // link editing
@@ -238,7 +214,7 @@
         // dragging canvas
         if (event.button === 2) {
             draggingCanvas = true;
-            dragStartMouse = getScreenMousePos(event);
+            dragStartMouse = getScreenMousePos(event, canvas);
             dragStartTranslation = translation.clone();
         }
     };
@@ -246,16 +222,16 @@
     const onmousemove = (event: MouseEvent) => {
         if (editingNode) return;
         
-        const worldPos = getMousePos(event);
+        const worldPos = getMousePos(event, canvas, translation, zoom);
         lastMousePos = worldPos;
 
         if (draggingNode) {
-            let node = data["nodes"].find(n => n.id === focusNode.id);
+            let node = data["nodes"].find(n => n.id === focusNode);
             if (!node) throw new Error("uhhh focusNode error, it's not in the list...");
             node.position = worldPos.clone().subtract(dragOffset).toArray();
         }
         else if (draggingCanvas) {
-            const pos = getScreenMousePos(event);
+            const pos = getScreenMousePos(event, canvas);
             const dMouse = pos.clone().subtract(dragStartMouse);
             translation = dragStartTranslation.clone().subtract(dMouse);
         }
@@ -276,7 +252,7 @@
     const onwheel = (event: WheelEvent) => {
         event.preventDefault();
 
-        const screenPos = getScreenMousePos(event);
+        const screenPos = getScreenMousePos(event, canvas);
         const world = screenPos.clone().add(translation).divideScalar(zoom);
 
         const change = Math.sign(event.deltaY);
@@ -320,7 +296,7 @@
         node.image = img;
 
         const index = data.nodes.indexOf(node);
-        if (index >= 0) {
+        if (index !== -1) {
             imageBuffer[index].src = node.image;
         }
 
@@ -392,6 +368,34 @@
     };
 
     
+    const loadGraph = (event: Event) => {
+        const input = event.target as HTMLInputElement;
+        if (!input.files || input.files.length === 0) return;
+
+        const file: File = input.files[0];
+
+        const reader = new FileReader();
+        reader.onload = () => {
+            if (typeof reader.result === "string") {
+                try {
+                    const json = JSON.parse(reader.result);
+                    if (!json.nodes || !json.links) throw new Error("Invalid graph data");
+                    data = cloneDatum(json);
+                    updateIDs();
+                    backPace = 1;
+                    stateBuffer = [cloneDatum(data)];
+                    setState();
+                    logger.log("Load new graph data");
+                }
+                catch (e: Error | any) {
+                    alert("Failed to load graph: " + e.message);
+                }
+            }
+        };
+
+        reader.readAsText(file);
+    };
+    
     const saveGraph = () => {
         if (window.confirm("Download new JSON?")) {
             const json = JSON.stringify(data, null, 4);
@@ -399,9 +403,18 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'data.json';
+            a.download = 'graph.json';
             a.click();
             URL.revokeObjectURL(url);
+        }
+    };
+
+    const saveImage = () => {
+        if (window.confirm("Download image? It will look as your canvas does now.")) {
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL('image/png');
+            link.download = 'graph.png';
+            link.click();
         }
     };
 
@@ -436,44 +449,20 @@
 
     <div class="absolute right-2.5 bottom-15">
         {#if (editingNode)}
-            <NodeEditor node={focusNode} {saveNode} {exitNode} />
+            <NodeEditor node={data.nodes[focusNode]} {saveNode} {exitNode} />
         {:else if (editingLink)}
-            <LinkEditor link={focusLink} {saveLink} {exitLink} />
+            <LinkEditor link={data.links[focusLink]} {saveLink} {exitLink} />
         {/if}
     </div>
 
     <div class="absolute right-2.5 bottom-2.5">
+        <button class="bg-neutral-800 text-white border-blue-500 text-center rounded-xl border-2 w-fit p-2 pt-1 transition duration-200 hover:bg-gray-700" aria-label="Save Image"
+        onclick={saveImage}>Save Image</button>
         <button class="bg-neutral-800 text-white border-blue-500 text-center rounded-xl border-2 w-fit p-2 pt-1 transition duration-200 hover:bg-gray-700" aria-label="Save Graph"
         onclick={saveGraph}>Save Graph</button>
         <button class="bg-neutral-800 text-white border-blue-500 text-center rounded-xl border-2 w-fit p-2 pt-1 transition duration-200 hover:bg-gray-700" aria-label="Load Graph"
         onclick={(event) => graphupload.click()}>Load Graph</button>
-        <input type="file" accept=".json" style:display="none" bind:this={graphupload} onchange={(event) => {
-            const input = event.target as HTMLInputElement;
-            if (!input.files || input.files.length === 0) return;
-
-            const file: File = input.files[0];
-
-            const reader = new FileReader();
-            reader.onload = () => {
-                if (typeof reader.result === "string") {
-                    try {
-                        const json = JSON.parse(reader.result);
-                        if (!json.nodes || !json.links) throw new Error("Invalid graph data");
-                        data = cloneDatum(json);
-                        updateIDs();
-                        backPace = 1;
-                        stateBuffer = [cloneDatum(data)];
-                        setState();
-                        logger.log("Load new graph data");
-                    } catch (e: Error | any) {
-                        alert("Failed to load graph: " + e.message);
-                    }
-                }
-            };
-
-            reader.readAsText(file);
-        }}
-        />
+        <input type="file" accept=".json" style:display="none" bind:this={graphupload} onchange={loadGraph}/>
     </div>
 
     
@@ -483,5 +472,12 @@
     
     <ModePicker modeChanged={(m: number) => mode = m} bind:this={modepicker} />
     
-    <Controls bind:mode={mode}/>
+    <Controls bind:mode={mode} controls={{
+        "Right Click and Drag": "move viewport",
+        "Scroll Wheel": "zoom in and out",
+        "Ctrl-Z": "undo",
+        "Ctrl-Y": "redo",
+        "Ctrl-S": "save",
+        "Ctrl-O": "open"
+    }}/>
 </div>

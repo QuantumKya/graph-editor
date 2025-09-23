@@ -27,15 +27,9 @@
         "Add Edge",
         "Edit Edge"
     ]
-    const controls = {
-        "Ctrl-Z": "undo",
-        "Ctrl-Y": "redo",
-        "Ctrl-S": "save",
-        "Ctrl-O": "open"
-    };
 
 
-    let { mode = $bindable() } = $props();
+    let { mode = $bindable(), controls } = $props();
 
     let open: boolean = $state(true);
     let menu: HTMLDivElement;
@@ -43,17 +37,19 @@
 
 </script>
 
-<div class="absolute right-1 top-1 transition duration-200" bind:this={menu}>
+<div class="absolute right-1 top-1" bind:this={menu}>
     <div bind:this={menubody} class="bg-neutral-200 border-blue-300 border-4 p-3 pr-10 pb-6 rounded-lg">
         <h1 class="text-2xl">Controls</h1>
         {#each Object.entries(controls) as [key, value]}
             <p class="pl-2"><strong>{key}</strong> — {value}</p>
         {/each}
+        {#if mode !== -1}
         <br>
         <h2>Mode-Specific Controls — {depctrlnames[mode]}</h2>
         {#each Object.entries(depcontrols[mode]) as [key, value]}
             <p class="pl-2"><strong>{key}</strong> — {value}</p>
         {/each}
+        {/if}
     </div>
 
     {#if open}
