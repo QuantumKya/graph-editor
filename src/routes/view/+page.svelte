@@ -1,6 +1,19 @@
+<svelte:head>
+    <title>Graph Viewer</title>
+    <style>
+        body {
+            overflow-y: hidden;
+        }
+    </style>
+</svelte:head>
+
+<svelte:document {onkeydown}></svelte:document>
+
 <script lang="ts">
-    import { cloneDatum, getMousePos, getScreenMousePos, type GraphData } from "$lib";
+    import { btnstyle, cloneDatum, findDistance, getMousePos, getScreenMousePos, type GraphData } from "$lib";
     import Controls from "$lib/Controls.svelte";
+    import LinkViewer from "$lib/LinkViewer.svelte";
+    import NodeViewer from "$lib/NodeViewer.svelte";
     import { onMount } from "svelte";
     import Victor from "victor";
 
@@ -15,11 +28,13 @@
     let dragStartMouse: Victor;
     let dragStartTranslation: Victor;
 
-    let data: GraphData = $state({ nodes: [ { "id": 0, "name": "Node", "image": "", "position": [200, 300] } ], links: [] });
-    
-    let lastMousePos: Victor;
+    let data: GraphData = $state({ nodes: [ { "id": 0, "name": "Node", "description": "", "image": "", "position": [200, 300] } ], links: [] });
 
     let imageBuffer: HTMLImageElement[] = [];
+
+    let focusPart = $state({ subset: true, id: -1 });
+    let viewing = $state(false);
+    let viewPos = $state(new Victor(0, 0));
 
     
 
@@ -63,20 +78,41 @@
     };
 
     const onmousedown = (event: MouseEvent) => {
-        const pos = getMousePos(event, canvas, translation, zoom);
-        
         // dragging canvas
         if (event.button === 0) {
-            draggingCanvas = true;
-            dragStartMouse = getScreenMousePos(event, canvas);
-            dragStartTranslation = translation.clone();
+            const scrpos = getScreenMousePos(event, canvas);
+            const pos = getMousePos(event, canvas, translation, zoom);
+            let node = data["nodes"].find(
+                node => Victor.fromArray(node.position).distanceSq(pos) < 400
+            );
+
+            let link = data["links"].find(lnk => {
+                const n1 = data["nodes"][lnk.from];
+                const n2 = data["nodes"][lnk.to];
+                return findDistance(Victor.fromArray(n1.position), Victor.fromArray(n2.position), pos) < 10;
+            });
+
+            if (node) {
+                focusPart.subset = true;
+                focusPart.id = node.id;
+                viewing = true;
+                viewPos = scrpos;
+            }
+            else if (link) {
+                focusPart.subset = false;
+                focusPart.id = data.links.indexOf(link);
+                viewing = true;
+                viewPos = scrpos;
+            }
+            else {
+                draggingCanvas = true;
+                dragStartMouse = getScreenMousePos(event, canvas);
+                dragStartTranslation = translation.clone();
+            }
         }
     };
 
     const onmousemove = (event: MouseEvent) => {
-        const worldPos = getMousePos(event, canvas, translation, zoom);
-        lastMousePos = worldPos;
-
         if (draggingCanvas) {
             const pos = getScreenMousePos(event, canvas);
             const dMouse = pos.clone().subtract(dragStartMouse);
@@ -106,6 +142,7 @@
         if (event.ctrlKey) {
             if (event.key === "o") { event.preventDefault(); graphupload.click(); }
             if (event.key === "s") { event.preventDefault(); saveGraph(); }
+            if (event.shiftKey && event.key === "s") { event.preventDefault(); saveImage(); }
         }
     };
 
@@ -190,23 +227,37 @@
     });
 </script>
 
-<canvas class="bg-neutral-100 w-full h-full" tabindex="0" class:cursor-grabbing={draggingCanvas}
-    bind:this={canvas}
-    {onmousemove} {onmousedown} {onmouseup} {onkeydown} {onwheel}
-    oncontextmenu={event => event.preventDefault()}
-></canvas>
+<div id="canvas-box" class="relative inline-block overflow-hidden">
 
-<div class="absolute right-2.5 bottom-2.5">
-    <button class="bg-neutral-800 text-white border-blue-500 text-center rounded-xl border-2 w-fit p-2 pt-1 transition duration-200 hover:bg-gray-700" aria-label="Save Image"
-    onclick={saveImage}>Save Image</button>
-    <button class="bg-neutral-800 text-white border-blue-500 text-center rounded-xl border-2 w-fit p-2 pt-1 transition duration-200 hover:bg-gray-700" aria-label="Save Graph"
-    onclick={saveGraph}>Save Graph</button>
-    <button class="bg-neutral-800 text-white border-blue-500 text-center rounded-xl border-2 w-fit p-2 pt-1 transition duration-200 hover:bg-gray-700" aria-label="Load Graph"
-    onclick={(event) => graphupload.click()}>Load Graph</button>
-    <input type="file" accept=".json" style:display="none" bind:this={graphupload} onchange={loadGraph}/>
+    <canvas class="bg-neutral-100" tabindex="0" class:cursor-grabbing={draggingCanvas}
+        bind:this={canvas}
+        {onmousemove} {onmousedown} {onmouseup} {onwheel}
+        oncontextmenu={event => event.preventDefault()}
+    ></canvas>
+
+    <div class="absolute w-fit h-fit"
+        style="left: {viewPos.x}px; top: {viewPos.y}px;">
+        {#if viewing}
+        <NodeViewer node={(focusPart.subset ? data.nodes : data.links)[focusPart.id]} bind:open={viewing} />
+        {/if}
+    </div>
+
+    <div class="absolute right-2.5 bottom-2.5">
+        <button class="{btnstyle}" aria-label="Save Image"
+        onclick={saveImage}>Save Image</button>
+        <button class="{btnstyle}" aria-label="Save Graph"
+        onclick={saveGraph}>Save Graph</button>
+        <button class="{btnstyle}" aria-label="Load Graph"
+        onclick={(event) => graphupload.click()}>Load Graph</button>
+        <input type="file" accept=".json" style:display="none" bind:this={graphupload} onchange={loadGraph}/>
+    </div>
+
+    <Controls mode={-1} controls={{
+        "Left Click (on graph)": "view node/link info",
+        "Left Click and Drag": "move viewport",
+        "Scroll Wheel": "zoom in and out",
+        "Ctrl-O": "open graph",
+        "Ctrl-S": "save graph",
+        "Ctrl-Shift-S": "save graph as image"
+    }} />
 </div>
-
-<Controls mode={-1} controls={{
-    "Left Click and Drag": "move viewport",
-    "Scroll Wheel": "zoom in and out"
-}} />

@@ -2,7 +2,7 @@
 
 import Victor from "victor";
 
-export type GraphData = { nodes: { id: number, name: string, image: string, position: number[] }[], links: { from: number, to: number, name: string, description: string }[] };
+export type GraphData = { nodes: { id: number, name: string, description: string, image: string, position: number[] }[], links: { from: number, to: number, name: string, description: string }[] };
 
 export const cloneDatum = (datum: GraphData): GraphData => {
     return {
@@ -35,3 +35,6 @@ export const findDistance = (l1: Victor, l2: Victor, p: Victor): number => {
     const base = l2.clone().subtract(l1).length();
     return parallelogramArea / base;
 };
+
+export const btnstyle = "bg-neutral-800 text-white border-blue-500 text-center rounded-xl border-2 w-fit p-2 pt-1 transition duration-200 hover:bg-gray-700";
+export const txtstyle = "font-mono text-lg bg-neutral-800 text-white rounded-xl p-2 pl-3 transition duration-300 focus:bg-gray-700 focus:ring-2 focus:ring-blue-500 outline-none";

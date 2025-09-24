@@ -9,6 +9,7 @@
 
     let open: boolean = $state(true);
     let menu: HTMLDivElement;
+    let menubody: HTMLDivElement;
 
     export const log = (action: string, detail?: string) => {
         if (backPace > 0) {
@@ -43,12 +44,12 @@
 
 <div class="absolute bottom-1 left-1 transition duration-200" bind:this={menu}>
     {#if open}
-    <button onclick={(event) => { open = false; menu.style.bottom = `-225px` }} aria-label="Close Menu"><i class="fa-solid fa-chevron-down"></i></button>
+    <button onclick={(event) => { open = false; menu.style.bottom = `-${menubody.offsetHeight}px` }} aria-label="Close Menu"><i class="fa-solid fa-chevron-down"></i></button>
     {:else}
     <button onclick={(event) => { open = true; menu.style.bottom = '4px'; }} aria-label="Open Menu"><i class="fa-solid fa-chevron-up"></i></button>
     {/if}
 
-    <div class="flex flex-col gap-0 w-fit p-1 rounded-xl font-mono text-blue-300 bg-gray-700">
+    <div class="flex flex-col gap-0 w-fit p-1 rounded-xl font-mono text-blue-300 bg-gray-800 border-2 border-blue-500" bind:this={menubody}>
         <p class="text-center"> ------------------ Edit Log ------------------ </p>
         
         <textarea class="resize-none overflow-y-scroll text-wrap outline-none"

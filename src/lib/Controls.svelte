@@ -45,7 +45,7 @@
         {/each}
         {#if mode !== -1}
         <br>
-        <h2>Mode-Specific Controls — {depctrlnames[mode]}</h2>
+        <h2 class="text-xl">Mode Controls — {depctrlnames[mode]}</h2>
         {#each Object.entries(depcontrols[mode]) as [key, value]}
             <p class="pl-2"><strong>{key}</strong> — {value}</p>
         {/each}
@@ -53,8 +53,10 @@
     </div>
 
     {#if open}
-    <button onclick={(event) => { open = false; menu.style.top = `-${menubody.offsetHeight}px` }} aria-label="Close Menu"><i class="fa-solid fa-chevron-up"></i></button>
+    <button onclick={(event) => { open = false; menu.style.top = `-${menubody.offsetHeight}px` }}
+    class="transition-all duration-200" aria-label="Close Menu"><i class="fa-solid fa-chevron-up"></i></button>
     {:else}
-    <button onclick={(event) => { open = true; menu.style.top = '4px'; }} aria-label="Open Menu"><i class="fa-solid fa-chevron-down"></i></button>
+    <button onclick={(event) => { open = true; menu.style.top = '4px'; }}
+    class="transition-all duration-200" aria-label="Open Menu"><i class="fa-solid fa-chevron-down"></i></button>
     {/if}
 </div>

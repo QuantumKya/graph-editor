@@ -7,18 +7,20 @@
     </style>
 </svelte:head>
 
+<svelte:document {onkeydown}></svelte:document>
+
 <script lang="ts">
     import { onMount } from 'svelte';
     
+    import { btnstyle, cloneDatum, findDistance, getMousePos, getScreenMousePos, type GraphData } from '$lib';
+    import Victor from 'victor';
+
     import NodeEditor from '$lib/NodeEditor.svelte';
     import ModePicker from '$lib/ModePicker.svelte';
-
-    import Victor from 'victor';
     import EditLogger from '$lib/EditLogger.svelte';
     import UndoRedo from '$lib/UndoRedo.svelte';
     import LinkEditor from '$lib/LinkEditor.svelte';
     import Controls from '$lib/Controls.svelte';
-    import { cloneDatum, findDistance, getMousePos, getScreenMousePos, type GraphData } from '$lib';
 
     type MNode = GraphData["nodes"][0];
     type MLink = GraphData["links"][0];
@@ -40,7 +42,7 @@
         });
         const newFocus = data["nodes"].findIndex(n => n.id === focusNode);
         if (newFocus) focusNode = newFocus;
-        else focusNode = 0;
+        else focusNode = -1;
     };
 
     let canvas: HTMLCanvasElement;
@@ -58,17 +60,17 @@
 
     let dragOffset: Victor = new Victor(0, 0);
 
-    let data: GraphData = $state({ nodes: [ { "id": 0, "name": "Node", "image": "", "position": [200, 300] } ], links: [] });
-    let stateBuffer: GraphData[] = [{ nodes: [ { "id": 0, "name": "Node", "image": "", "position": [200, 300] } ], links: [] }];
-    let backPace: number = 1;
+    let data: GraphData = $state({ nodes: [ { "id": 0, "name": "Node", "description": "", "image": "", "position": [200, 300] } ], links: [] });
+    let stateBuffer: GraphData[] = $state([{ nodes: [ { "id": 0, "name": "Node", "description": "", "image": "", "position": [200, 300] } ], links: [] }]);
+    let backPace: number = $state(1);
 
     let imageBuffer: HTMLImageElement[] = [];
 
-    let focusNode: number = $state(0);
+    let focusNode: number = $state(-1);
     let draggingNode: boolean = $state(false);
     let editingNode: boolean = $state(false);
 
-    let focusLink: number = $state(0);
+    let focusLink: number = $state(-1);
     let editingLink: boolean = $state(false);
 
     let linkNode: MNode;
@@ -127,7 +129,7 @@
     };
 
     const onmousedown = (event: MouseEvent) => {
-        if (editingNode) return;
+        if (editingNode || editingLink) return;
 
         const pos = getMousePos(event, canvas, translation, zoom);
         let node = data["nodes"].find(
@@ -147,7 +149,7 @@
             // node adding
             if (mode === 0) {
                 if (!node) {
-                    data["nodes"].push({ id: -1, name: "", image: "", position: pos.toArray() });
+                    data["nodes"].push({ id: -1, name: "", description: "", image: "", position: pos.toArray() });
                     updateIDs();
                     imageBuffer.push(new Image());
                     update();
@@ -220,7 +222,7 @@
     };
 
     const onmousemove = (event: MouseEvent) => {
-        if (editingNode) return;
+        if (editingNode || editingLink) return;
         
         const worldPos = getMousePos(event, canvas, translation, zoom);
         lastMousePos = worldPos;
@@ -238,7 +240,7 @@
     };
 
     const onmouseup = (event: MouseEvent) => {
-        if (editingNode) return;
+        if (editingNode || editingLink) return;
 
         if (draggingNode) {
             draggingNode = false;
@@ -273,14 +275,16 @@
             if (event.key === "s") { event.preventDefault(); saveGraph(); }
             if (event.key === "z") undo();
             if (event.key === "y") redo();
+            if (event.shiftKey && event.key === "s") { event.preventDefault(); saveImage(); }
         }
     };
 
     
-    const saveNode = (node: MNode, title: string, img: string): boolean => {
+    const saveNode = (node: MNode, title: string, desc: string, img: string): boolean => {
         let checkArray = [
             node.name === title ? "" : "name",
-            node.image === img ? "" : "image"
+            node.image === img ? "" : "image",
+            node.description === desc ? "" : "description"
         ];
         
         let strArray: string[] = [];
@@ -349,8 +353,13 @@
         console.log(backPace);
     };
 
+    let undoable = $derived(backPace < stateBuffer.length);
+    let redoable = $derived(backPace > 1);
+
     const undo = () => {
-        if (backPace > stateBuffer.length - 1) return;
+        if (editingNode || editingLink) return;
+
+        if (!undoable) return;
         backPace++;
         setState();
         logger.undo();
@@ -359,7 +368,9 @@
     };
 
     const redo = () => {
-        if (backPace < 2) return;
+        if (editingNode || editingLink) return;
+
+        if (!redoable) return;
         backPace--;
         setState();
         logger.redo();
@@ -369,6 +380,8 @@
 
     
     const loadGraph = (event: Event) => {
+        if (editingNode || editingLink) return;
+
         const input = event.target as HTMLInputElement;
         if (!input.files || input.files.length === 0) return;
 
@@ -423,6 +436,8 @@
 
 
     const updateIDs = () => {
+        if (editingNode || editingLink) return;
+        
         const key = new Map(data["nodes"].map((node, i) => [node.id, i]));
         data["nodes"].forEach((node, i) => node.id = i);
         data["links"].forEach(link => {
@@ -443,7 +458,7 @@
 
     <canvas class="bg-neutral-100" tabindex="0" class:cursor-grabbing={draggingNode || draggingCanvas}
         bind:this={canvas}
-        {onmousemove} {onmousedown} {onmouseup} {onkeydown} {onwheel}
+        {onmousemove} {onmousedown} {onmouseup} {onwheel}
         oncontextmenu={event => event.preventDefault()}
     ></canvas>
 
@@ -456,11 +471,11 @@
     </div>
 
     <div class="absolute right-2.5 bottom-2.5">
-        <button class="bg-neutral-800 text-white border-blue-500 text-center rounded-xl border-2 w-fit p-2 pt-1 transition duration-200 hover:bg-gray-700" aria-label="Save Image"
+        <button class="{btnstyle}" aria-label="Save Image"
         onclick={saveImage}>Save Image</button>
-        <button class="bg-neutral-800 text-white border-blue-500 text-center rounded-xl border-2 w-fit p-2 pt-1 transition duration-200 hover:bg-gray-700" aria-label="Save Graph"
+        <button class="{btnstyle}" aria-label="Save Graph"
         onclick={saveGraph}>Save Graph</button>
-        <button class="bg-neutral-800 text-white border-blue-500 text-center rounded-xl border-2 w-fit p-2 pt-1 transition duration-200 hover:bg-gray-700" aria-label="Load Graph"
+        <button class="{btnstyle}" aria-label="Load Graph"
         onclick={(event) => graphupload.click()}>Load Graph</button>
         <input type="file" accept=".json" style:display="none" bind:this={graphupload} onchange={loadGraph}/>
     </div>
@@ -468,7 +483,7 @@
     
     <EditLogger bind:this={logger} />
     
-    <UndoRedo {undo} {redo} />
+    <UndoRedo {undo} {redo} bind:undoable={undoable} bind:redoable={redoable} />
     
     <ModePicker modeChanged={(m: number) => mode = m} bind:this={modepicker} />
     
@@ -477,7 +492,8 @@
         "Scroll Wheel": "zoom in and out",
         "Ctrl-Z": "undo",
         "Ctrl-Y": "redo",
-        "Ctrl-S": "save",
-        "Ctrl-O": "open"
+        "Ctrl-O": "open graph",
+        "Ctrl-S": "save graph",
+        "Ctrl-Shift-S": "save graph as image"
     }}/>
 </div>
