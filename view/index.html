@@ -5,28 +5,34 @@
 		<link rel="icon" href="../favicon.svg" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		
-		<link href="../_app/immutable/assets/0.BlROHdx7.css" rel="stylesheet">
-		<link rel="modulepreload" href="../_app/immutable/entry/start.NrLk-y-n.js">
-		<link rel="modulepreload" href="../_app/immutable/chunks/DTRGCwao.js">
-		<link rel="modulepreload" href="../_app/immutable/chunks/DsjGDbIo.js">
-		<link rel="modulepreload" href="../_app/immutable/chunks/BeWt66ZE.js">
-		<link rel="modulepreload" href="../_app/immutable/chunks/9tEt_Nny.js">
-		<link rel="modulepreload" href="../_app/immutable/chunks/BrUvtmUO.js">
-		<link rel="modulepreload" href="../_app/immutable/chunks/Df33kf_W.js">
-		<link rel="modulepreload" href="../_app/immutable/entry/app.oFTNC7km.js">
+		<link href="../_app/immutable/assets/0.C-xQIQen.css" rel="stylesheet">
+		<link rel="modulepreload" href="../_app/immutable/entry/start.C7xaIHAk.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/DABSJZml.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/D4UJGxAj.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/DCiFBwZK.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/GnwKRTTK.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/gCJBu0H-.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/CBBT1DNg.js">
+		<link rel="modulepreload" href="../_app/immutable/entry/app.DzdNoLom.js">
 		<link rel="modulepreload" href="../_app/immutable/chunks/CWj6FrbW.js">
-		<link rel="modulepreload" href="../_app/immutable/chunks/CKogC_md.js">
-		<link rel="modulepreload" href="../_app/immutable/chunks/D_Y7g2-O.js">
-		<link rel="modulepreload" href="../_app/immutable/nodes/0.BHggagvl.js">
-		<link rel="modulepreload" href="../_app/immutable/nodes/4.C_tR-0BV.js">
-		<link rel="modulepreload" href="../_app/immutable/chunks/D3AxRAeF.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/CLeLst1N.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/CvNMPwJY.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/DlpU1sNi.js">
+		<link rel="modulepreload" href="../_app/immutable/nodes/0.CDXk1680.js">
+		<link rel="modulepreload" href="../_app/immutable/nodes/4.BPNna4i-.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/7kg2MtJh.js">
+		<link rel="modulepreload" href="../_app/immutable/chunks/jEiHzXEX.js"><!--[--><style>
+        body {
+            overflow-y: hidden;
+        }
+    </style><!--]--><title>Graph Viewer</title>
 	</head>
 	<body data-sveltekit-preload-data="hover">
-		<div style="display: contents"><!--[--><!--[--><!----><!----><canvas class="bg-neutral-100 w-full h-full" tabindex="0"></canvas> <div class="absolute right-2.5 bottom-2.5"><button class="bg-neutral-800 text-white border-blue-500 text-center rounded-xl border-2 w-fit p-2 pt-1 transition duration-200 hover:bg-gray-700" aria-label="Save Image">Save Image</button> <button class="bg-neutral-800 text-white border-blue-500 text-center rounded-xl border-2 w-fit p-2 pt-1 transition duration-200 hover:bg-gray-700" aria-label="Save Graph">Save Graph</button> <button class="bg-neutral-800 text-white border-blue-500 text-center rounded-xl border-2 w-fit p-2 pt-1 transition duration-200 hover:bg-gray-700" aria-label="Load Graph">Load Graph</button> <input type="file" accept=".json" style="display: none;"/></div> <div class="absolute right-1 top-1"><div class="bg-neutral-200 border-blue-300 border-4 p-3 pr-10 pb-6 rounded-lg"><h1 class="text-2xl">Controls</h1> <!--[--><p class="pl-2"><strong>Left Click and Drag</strong> — move viewport</p><p class="pl-2"><strong>Scroll Wheel</strong> — zoom in and out</p><!--]--> <!--[!--><!--]--></div> <!--[--><button aria-label="Close Menu"><i class="fa-solid fa-chevron-up"></i></button><!--]--></div><!----><!----><!----><!----><!--]--> <!--[!--><!--]--><!--]-->
+		<div style="display: contents"><!--[--><!--[--><!----><!----><div id="canvas-box" class="relative inline-block overflow-hidden"><canvas class="bg-neutral-100" tabindex="0"></canvas> <div class="absolute w-fit h-fit" style="left: 0px; top: 0px;"><!--[!--><!--]--></div> <div class="absolute right-2.5 bottom-2.5"><button class="bg-neutral-800 text-white border-blue-500 text-center rounded-xl border-2 w-fit p-2 pt-1 transition duration-200 hover:bg-gray-700" aria-label="Save Image">Save Image</button> <button class="bg-neutral-800 text-white border-blue-500 text-center rounded-xl border-2 w-fit p-2 pt-1 transition duration-200 hover:bg-gray-700" aria-label="Save Graph">Save Graph</button> <button class="bg-neutral-800 text-white border-blue-500 text-center rounded-xl border-2 w-fit p-2 pt-1 transition duration-200 hover:bg-gray-700" aria-label="Load Graph">Load Graph</button> <input type="file" accept=".json" style="display: none;"/></div> <div class="absolute right-1 top-1"><div class="bg-neutral-200 border-blue-300 border-4 p-3 pr-10 pb-6 rounded-lg"><h1 class="text-2xl">Controls</h1> <!--[--><p class="pl-2"><strong>Left Click (on graph)</strong> — view node/link info</p><p class="pl-2"><strong>Left Click and Drag</strong> — move viewport</p><p class="pl-2"><strong>Scroll Wheel</strong> — zoom in and out</p><p class="pl-2"><strong>Ctrl-O</strong> — open graph</p><p class="pl-2"><strong>Ctrl-S</strong> — save graph</p><p class="pl-2"><strong>Ctrl-Shift-S</strong> — save graph as image</p><!--]--> <!--[!--><!--]--></div> <!--[--><button class="transition-all duration-200" aria-label="Close Menu"><i class="fa-solid fa-chevron-up"></i></button><!--]--></div><!----></div><!----><!----><!----><!--]--> <!--[!--><!--]--><!--]-->
 			
 			<script>
 				{
-					__sveltekit_l7wyk3 = {
+					__sveltekit_hclacf = {
 						base: new URL("..", location).pathname.slice(0, -1),
 						assets: "/math-map"
 					};
@@ -34,8 +40,8 @@
 					const element = document.currentScript.parentElement;
 
 					Promise.all([
-						import("../_app/immutable/entry/start.NrLk-y-n.js"),
-						import("../_app/immutable/entry/app.oFTNC7km.js")
+						import("../_app/immutable/entry/start.C7xaIHAk.js"),
+						import("../_app/immutable/entry/app.DzdNoLom.js")
 					]).then(([kit, app]) => {
 						kit.start(app, element, {
 							node_ids: [0, 4],
