@@ -30,7 +30,7 @@
         bind:value={linkTitle}
     >
 
-    <textarea rows="6" maxlength="400" class="{txtstyle} placeholder:text-neutral-400 resize-none overflow-scroll" placeholder="Link Description"
+    <textarea rows=5 class="{txtstyle} placeholder:text-neutral-400 resize-none overflow-scroll" placeholder="Link Description"
         {onchange}
         bind:this={desctype}
         bind:value={linkDesc}

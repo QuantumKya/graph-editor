@@ -18,8 +18,8 @@
     import NodeEditor from '$lib/NodeEditor.svelte';
     import ModePicker from '$lib/ModePicker.svelte';
     import EditLogger from '$lib/EditLogger.svelte';
-    import UndoRedo from '$lib/UndoRedo.svelte';
     import LinkEditor from '$lib/LinkEditor.svelte';
+    import UndoRedo from '$lib/UndoRedo.svelte';
     import Controls from '$lib/Controls.svelte';
 
     type MNode = GraphData["nodes"][0];
@@ -41,8 +41,7 @@
             imageBuffer[i].src = node.image;
         });
         const newFocus = data["nodes"].findIndex(n => n.id === focusNode);
-        if (newFocus) focusNode = newFocus;
-        else focusNode = -1;
+        focusNode = newFocus;
     };
 
     let canvas: HTMLCanvasElement;
@@ -57,6 +56,7 @@
     let dragStartTranslation: Victor;
     
     let lastMousePos: Victor;
+    let viewPos: Victor = $state(new Victor(0, 0));
 
     let dragOffset: Victor = new Victor(0, 0);
 
@@ -177,6 +177,7 @@
             // node editing
             else if (mode === 1) { if (!node) return;
                 editingNode = true;
+                viewPos = getScreenMousePos(event, canvas);
             }
             // node dragging
             else if (mode === 2) { if (!node) return;
@@ -211,6 +212,7 @@
             // link editing
             else if (mode === 4) { if (!link) return;
                 editingLink = true;
+                viewPos = getScreenMousePos(event, canvas);
             }
         }
         // dragging canvas
@@ -283,8 +285,8 @@
     const saveNode = (node: MNode, title: string, desc: string, img: string): boolean => {
         let checkArray = [
             node.name === title ? "" : "name",
-            node.image === img ? "" : "image",
-            node.description === desc ? "" : "description"
+            node.description === desc ? "" : "description",
+            node.image === img ? "" : "image"
         ];
         
         let strArray: string[] = [];
@@ -297,6 +299,7 @@
         if (!window.confirm("Save this node with new contents?")) return false;
         
         node.name = title;
+        node.description = desc;
         node.image = img;
 
         const index = data.nodes.indexOf(node);
@@ -327,7 +330,7 @@
         const checkString = strArray.join(", ");
 
         if (checkString === "") return false;
-        if (!window.confirm("Save this node with new contents?")) return false;
+        if (!window.confirm("Save this link with new contents?")) return false;
         
         link.name = title;
         link.description = desc;
@@ -349,8 +352,6 @@
             backPace = 1;
         }
         stateBuffer.push(cloneDatum(data));
-        console.log(stateBuffer);
-        console.log(backPace);
     };
 
     let undoable = $derived(backPace < stateBuffer.length);
@@ -363,8 +364,6 @@
         backPace++;
         setState();
         logger.undo();
-        console.log(stateBuffer);
-        console.log(backPace);
     };
 
     const redo = () => {
@@ -374,8 +373,6 @@
         backPace--;
         setState();
         logger.redo();
-        console.log(stateBuffer);
-        console.log(backPace);
     };
 
     
@@ -441,15 +438,15 @@
         const key = new Map(data["nodes"].map((node, i) => [node.id, i]));
         data["nodes"].forEach((node, i) => node.id = i);
         data["links"].forEach(link => {
-            console.log(`${link.from}, ${link.to}`);
             link.from = key.get(link.from) ?? link.from;
             link.to = key.get(link.to) ?? link.to;
-            console.log(`${link.from}, ${link.to}`);
         });
     };
 
     onMount(() => {
-        imageBuffer = data["nodes"].map(node => { let img = new Image(); img.src = node.image; return img; });
+        const img = new Image();
+        img.src = '';
+        imageBuffer = [img];
         draw();
     });
 </script>
@@ -462,7 +459,8 @@
         oncontextmenu={event => event.preventDefault()}
     ></canvas>
 
-    <div class="absolute right-2.5 bottom-15">
+    <div class="absolute z-10"
+    style="left: {viewPos.x}px; top: {viewPos.y}px;">
         {#if (editingNode)}
             <NodeEditor node={data.nodes[focusNode]} {saveNode} {exitNode} />
         {:else if (editingLink)}

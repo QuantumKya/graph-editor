@@ -15,7 +15,7 @@
         class="font-mono text-lg bg-neutral-800 text-white rounded-xl p-2 pl-3 placeholder:text-neutral-400 resize-none overflow-scroll"
         >{node.name}</textarea>
 
-        <textarea rows=6 maxlength=400 readonly placeholder="Node Description"
+        <textarea rows=5 readonly placeholder="Node Description"
         class="font-mono text-lg bg-neutral-800 text-white rounded-xl p-2 pl-3 placeholder:text-neutral-400 resize-none overflow-scroll focus:outline-none"
         >{node.description}</textarea>
     {:else}
@@ -23,7 +23,7 @@
         class="font-mono text-lg bg-neutral-800 text-white rounded-xl p-2 pl-3 placeholder:text-neutral-400 resize-none overflow-scroll"
         >{node.name}</textarea>
 
-        <textarea rows=6 maxlength=400 readonly placeholder="Link Description"
+        <textarea rows=5 readonly placeholder="Link Description"
         class="font-mono text-lg bg-neutral-800 text-white rounded-xl p-2 pl-3 placeholder:text-neutral-400 resize-none overflow-scroll focus:outline-none"
         >{node.description}</textarea>
     {/if}

@@ -12,7 +12,6 @@
 <script lang="ts">
     import { btnstyle, cloneDatum, findDistance, getMousePos, getScreenMousePos, type GraphData } from "$lib";
     import Controls from "$lib/Controls.svelte";
-    import LinkViewer from "$lib/LinkViewer.svelte";
     import NodeViewer from "$lib/NodeViewer.svelte";
     import { onMount } from "svelte";
     import Victor from "victor";
@@ -173,15 +172,12 @@
                     const json = JSON.parse(reader.result);
                     if (!json.nodes || !json.links) throw new Error("Invalid graph data");
                     data = cloneDatum(json);
-                    updateIDs();
                     setState();
                 }
                 catch (e: Error | any) {
                     alert("Failed to load graph: " + e.message);
                 }
             }
-
-            console.log(data);
         };
 
         reader.readAsText(file);
@@ -207,17 +203,6 @@
             link.download = 'graph.png';
             link.click();
         }
-    };
-
-    const updateIDs = () => {
-        const key = new Map(data["nodes"].map((node, i) => [node.id, i]));
-        data["nodes"].forEach((node, i) => node.id = i);
-        data["links"].forEach(link => {
-            console.log(`${link.from}, ${link.to}`);
-            link.from = key.get(link.from) ?? link.from;
-            link.to = key.get(link.to) ?? link.to;
-            console.log(`${link.from}, ${link.to}`);
-        });
     };
 
     let graphupload: HTMLInputElement;

@@ -29,6 +29,7 @@
     
     onMount(() => {
         titletype.value = node.name;
+        desctype.value = node.description;
     });
 
     const onchange = () => {
@@ -43,36 +44,53 @@
         bind:value={nodeTitle}
     >
 
-    <textarea rows="6" maxlength="400" class="{txtstyle} placeholder:text-neutral-400 resize-none overflow-scroll" placeholder="Link Description"
+    <textarea rows=5 class="{txtstyle} placeholder:text-neutral-400 resize-none overflow-scroll" placeholder="Node Description"
         {onchange}
         bind:this={desctype}
         bind:value={nodeDesc}
     ></textarea>
 
-    {#if nodeImage != ""}
-        <img src={nodeImage} alt="Uploaded Icon" class="rounded-lg w-[150px]"/>
-    {:else}
-        <img src="{base}/landscape-placeholder.svg" alt="Uploaded Icon" class="rounded-lg w-[150px]"/>
-    {/if}
-    <button class="{btnstyle}" onclick={(event) => { imageupload.click(); }}
-    >Upload Image</button>
-    <input type="file" accept="image/*" style:display="none" bind:this={imageupload} onchange={(event) => {
-        const input = event.target as HTMLInputElement;
-        if (!input.files || input.files.length === 0) return;
+    <div class="flex flex-row gap-2">
+        {#if nodeImage !== ""}
+            <img src={nodeImage} alt="Uploaded Icon" class="rounded-lg w-[100px]"/>
+        {:else}
+            <img src={base + "/landscape-placeholder.svg"} alt="Uploaded Icon" class="rounded-lg w-[100px]"/>
+        {/if}
 
-        const file: File = input.files[0];
+        <div class="flex flex-col gap-5">
 
-        const reader = new FileReader();
-        reader.onload = () => {
-            if (typeof reader.result === "string") {
-                nodeImage = reader.result;
-            }
-        };
+            <button class="{btnstyle} h-fit" onclick={(event) => { imageupload.click(); }}
+            >Upload Image</button>
+            <input type="file" accept="image/*" style:display="none" bind:this={imageupload} onchange={(event) => {
+                const input = event.target as HTMLInputElement;
+                if (!input.files || input.files.length === 0) return;
 
-        reader.readAsDataURL(file);
-        onchange();
-    }}
-    />
+                const file: File = input.files[0];
+
+                const reader = new FileReader();
+                reader.onload = () => {
+                    if (typeof reader.result === "string") {
+                        nodeImage = reader.result;
+                    }
+                    else nodeImage = "";
+                };
+
+                reader.readAsDataURL(file);
+                onchange();
+            }}
+            />
+
+            <div class="relative inline-block h-fit">
+                <button class="{btnstyle} float-left"
+                    onclick={() => { saved = saveNode(node, nodeTitle, nodeDesc, nodeImage); }}
+                >Save</button>
+                
+                <button class="{btnstyle} float-right"
+                    onclick={() => exitNode(saved, changed)}
+                >Exit</button>
+            </div>
+        </div>
+    </div>
 
     <!--
     <input type="text" class="{text_input_css}" placeholder="Link Addend"
@@ -83,15 +101,4 @@
 
     <a href="https://en.wikipedia.org/wiki/{wikiLink}" class="underline">Wikipedia</a>
     -->
-    
-
-    <div class="relative inline-block h-fit">
-        <button class="{btnstyle} float-left"
-            onclick={() => { saved = saveNode(node, nodeTitle, nodeImage); }}
-        >Save</button>
-        
-        <button class="{btnstyle} float-right"
-            onclick={() => exitNode(saved, changed)}
-        >Exit</button>
-    </div>
 </div>
