@@ -2,6 +2,8 @@
 
 A graph editor with customizable names and descriptions for every node and edge.
 
+***IMPORTANT*: Javascript alerts are required for the site to function**
+
 There are two pages on the site:
 The Make page and the View page.
 
