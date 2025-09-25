@@ -158,7 +158,7 @@
                 else if (window.confirm("Delete node and its links?")) {
                     const id = node.id;
                     data["nodes"].splice(id, 1);
-                    focusNode = 0;
+                    focusNode = -1;
                     imageBuffer.splice(id, 1);
 
                     let killList: number[] = [];
@@ -167,7 +167,7 @@
                             killList.push(i);
                         }
                     });
-                    for (const i of killList) data["links"].splice(i, 1);
+                    data.links = data.links.filter((link, i) => !killList.includes(i));
 
                     updateIDs();
                     update();
