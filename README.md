@@ -5,7 +5,7 @@ A graph editor with customizable names and descriptions for every node and edge.
 There are two pages on the site:
 The Make page and the View page.
 
-## The Make Page
+## How to Graph — The Make Page
 
 ![Make Page Annotated](devlog/img/make_page_annotated.jpg)
 
@@ -34,7 +34,7 @@ Where your tools are. They are, in order:
 
 Both the Edit Log and Controls List are minimizable, as they take up a lot of space. Click the little arrow at their side to close them, and again to open them up.
 
-## View Page
+## "&#9834; Look at This Graph &#9834;" — View Page
 
 ![View Page Annotated](devlog/img/view_page_annotated.jpg)
 
