@@ -14,6 +14,7 @@
         {
             "Left Click (on Node A)": "start new edge from node",
             "Left Click (on node, once started edge)": "add new edge",
+            "Left Click (on existing edge)": "delete selected edge",
             "Escape": "cancel new edge"
         },
         {
